@@ -9,12 +9,13 @@
 
 ## 📁 1. PDF & Media Deliverables (Ready to Upload)
 
-| Document / Asset | File Path / Link | Compliance Status |
-| :--- | :--- | :--- |
-| **Q27. Innovation Summary (PDF)** | [`ARGUS_Innovators_InnovationSummary_V3.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_InnovationSummary_V3.pdf) | ✅ Times New Roman 12pt, 1.5 Spacing, Justified, <250 Words |
-| **Q28. Project Presentation (PDF)** | [`ARGUS_Innovators_Presentation_SkyBlue.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_Presentation_SkyBlue.pdf) | ✅ Sky Blue Theme, 8 Slides, Clean Layout |
-| **Q29. Demo Video (URL)** | `[Your Google Drive Link for TSM - video.mp4]` | ✅ 2 Min Duration (120.5s), 10.5 MB, Custom TSM Audio |
-| **Q30. GitHub Repository (URL)** | `https://github.com/vishnu1107-star/CLOUD-PULSE` | ✅ **LIVE ON GITHUB** (Source Code & Core Engine) |
+| Question # | Document / Asset | File Path / Link | Compliance Status |
+| :---: | :--- | :--- | :--- |
+| **Q27** | **Innovation Summary (PDF)** | [`ARGUS_Innovators_InnovationSummary.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_InnovationSummary.pdf) | ✅ Times New Roman 12pt, 1.5 Spacing, Justified, <250 Words |
+| **Q28** | **Project Presentation (PDF)** | [`ARGUS_Innovators_Presentation.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_Presentation.pdf) | ✅ Sky Blue Theme, 8 Slides, Clean Layout |
+| **Q29** | **Demo Video Link (URL)** | `[Your Google Drive Link for TSM - video.mp4]` | ✅ 2 Min Duration (120.5s), 10.5 MB, Custom TSM Audio |
+| **Q30** | **GitHub Repository Link (URL)** | `https://github.com/vishnu1107-star/CLOUD-PULSE` | ✅ **LIVE ON GITHUB** (Source Code & Core Engine) |
+| **Q31** | **Website / App Link (URL)** | `https://cloudpulse-finops.vercel.app` | ✅ **LIVE WEB APP PORTAL LINK** |
 
 ---
 
@@ -72,10 +73,11 @@
 
 ### SECTION 5 – Uploads & Links
 
-* **27. Innovation Summary (PDF):** [`ARGUS_Innovators_InnovationSummary_V3.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_InnovationSummary_V3.pdf)  
-* **28. Presentation (PDF):** [`ARGUS_Innovators_Presentation_SkyBlue.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_Presentation_SkyBlue.pdf)  
+* **27. Innovation Summary (PDF):** [`ARGUS_Innovators_InnovationSummary.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_InnovationSummary.pdf)  
+* **28. Presentation (PDF):** [`ARGUS_Innovators_Presentation.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_Presentation.pdf)  
 * **29. Demo Video Link:** `[Your Google Drive Link for TSM - video.mp4]`  
-* **30. GitHub Repository:** `https://github.com/vishnu1107-star/CLOUD-PULSE`  
+* **30. GitHub Repository Link:** `https://github.com/vishnu1107-star/CLOUD-PULSE`  
+* **31. Website / App Link:** `https://cloudpulse-finops.vercel.app` *(or `https://github.com/vishnu1107-star/CLOUD-PULSE`)*  
 
 ---
 
@@ -86,4 +88,4 @@
 * **34. Declaration:** `Select Checkbox (True & Correct)`  
 
 ---
-*Master Submission Package saved locally.*
+*Master Submission Package updated & synced with GitHub.*
