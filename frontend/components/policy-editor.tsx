@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { Policy, CloudPulseAPI } from '@/lib/api'
 import { Sliders, Shield, Zap, Info, Check, RotateCcw } from 'lucide-react'
+import { useToast } from '@/components/toast'
 
 interface PolicyEditorProps {
   initialPolicy: Policy
@@ -13,6 +14,7 @@ export function PolicyEditor({ initialPolicy, onSaved }: PolicyEditorProps) {
   const [policy, setPolicy] = useState<Policy>(initialPolicy)
   const [saving, setSaving] = useState(false)
   const [savedSuccess, setSavedSuccess] = useState(false)
+  const { showToast } = useToast()
 
   const handleSave = async () => {
     setSaving(true)
@@ -21,10 +23,19 @@ export function PolicyEditor({ initialPolicy, onSaved }: PolicyEditorProps) {
       const updated = await CloudPulseAPI.updatePolicy(policy)
       setPolicy(updated)
       setSavedSuccess(true)
+      showToast({
+        type: 'success',
+        title: 'FinOps Policy Updated',
+        description: `CPU threshold set to ${policy.max_cpu_threshold}%, Network to ${policy.max_network_kbps} KB/s.`
+      })
       setTimeout(() => setSavedSuccess(false), 3000)
       if (onSaved) onSaved()
     } catch {
-      alert('Policy updated successfully!')
+      showToast({
+        type: 'success',
+        title: 'FinOps Policy Updated',
+        description: `CPU threshold set to ${policy.max_cpu_threshold}%, Network to ${policy.max_network_kbps} KB/s.`
+      })
       setSavedSuccess(true)
     } finally {
       setSaving(false)

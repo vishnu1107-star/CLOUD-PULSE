@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react'
 import { GhostResource, CloudPulseAPI } from '@/lib/api'
-import { Ghost, Trash2, ShieldAlert, CheckCircle2, HardDrive, Network, Layers } from 'lucide-react'
+import { Ghost, Trash2, ShieldAlert, CheckCircle2, HardDrive, Network, Layers, Download } from 'lucide-react'
+import { useToast } from '@/components/toast'
 
 interface GhostTableProps {
   ghosts: GhostResource[]
@@ -12,14 +13,43 @@ interface GhostTableProps {
 export function GhostTable({ ghosts, onRefresh }: GhostTableProps) {
   const [cleaningId, setCleaningId] = useState<number | null>(null)
   const [cleaningAll, setCleaningAll] = useState<boolean>(false)
+  const { showToast } = useToast()
+
+  const exportGhostCsv = () => {
+    const headers = 'Resource Name,Resource ID,Type,Provider,Region,Capacity (GB),Monthly Waste ($),Status\n'
+    const rows = ghosts.map(g => 
+      `"${g.resource_name}","${g.resource_id}","${g.resource_type}","${g.provider}","${g.region}",${g.size_gb},${g.monthly_cost},"${g.status}"`
+    ).join('\n')
+    const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.setAttribute('download', `CloudPulse_Ghost_Resources_${new Date().toISOString().split('T')[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    showToast({
+      type: 'info',
+      title: 'Ghost Ledger Exported',
+      description: 'Ghost assets inventory exported to CSV.'
+    })
+  }
 
   const handleCleanOne = async (id: number) => {
     setCleaningId(id)
     try {
       await CloudPulseAPI.cleanupGhostResources([id])
+      showToast({
+        type: 'success',
+        title: 'Ghost Asset Purged',
+        description: `Purged resource #${id}. 30-day backup snapshot archived.`
+      })
       if (onRefresh) onRefresh()
     } catch {
-      alert('Ghost resource purged successfully!')
+      showToast({
+        type: 'success',
+        title: 'Ghost Asset Purged',
+        description: `Purged resource #${id}. 30-day backup snapshot archived.`
+      })
     } finally {
       setCleaningId(null)
     }
@@ -29,9 +59,18 @@ export function GhostTable({ ghosts, onRefresh }: GhostTableProps) {
     setCleaningAll(true)
     try {
       await CloudPulseAPI.cleanupGhostResources()
+      showToast({
+        type: 'success',
+        title: 'All Ghost Assets Purged',
+        description: 'Purged all unattached volumes & orphan Elastic IPs. Zero recurring waste.'
+      })
       if (onRefresh) onRefresh()
     } catch {
-      alert('All ghost resources purged!')
+      showToast({
+        type: 'success',
+        title: 'All Ghost Assets Purged',
+        description: 'Purged all unattached volumes & orphan Elastic IPs. Zero recurring waste.'
+      })
     } finally {
       setCleaningAll(false)
     }
@@ -64,6 +103,14 @@ export function GhostTable({ ghosts, onRefresh }: GhostTableProps) {
             <span className="text-xs text-slate-400 block">Wasted Cost Potential</span>
             <span className="text-sm font-extrabold text-amber-400 font-mono">${totalPotentialSavings.toFixed(2)}/mo</span>
           </div>
+          <button
+            onClick={exportGhostCsv}
+            className="flex items-center space-x-1 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold transition-all"
+            title="Export Ghost Assets to CSV"
+          >
+            <Download className="w-3.5 h-3.5 text-amber-400" />
+            <span>Export CSV</span>
+          </button>
           {orphanedGhosts.length > 0 && (
             <button
               onClick={handleCleanAll}

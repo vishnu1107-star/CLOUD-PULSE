@@ -3,7 +3,44 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 222 47% 7%;
+    --foreground: 210 40% 98%;
+  }
+
   body {
-    @apply bg-background text-slate-100 font-sans antialiased min-h-screen selection:bg-emerald-500 selection:text-black;
+    @apply bg-[#0b0f19] text-slate-100 font-sans antialiased min-h-screen selection:bg-emerald-500 selection:text-black;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Custom Clean Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0b0f19;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+  }
+}
+
+@layer components {
+  .enterprise-card {
+    @apply rounded-xl border border-slate-800/80 bg-slate-900/50 backdrop-blur-sm shadow-sm transition-all duration-200;
+  }
+  .enterprise-card:hover {
+    @apply border-slate-700/80;
+  }
+  .table-header {
+    @apply bg-slate-900/90 text-[11px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-800;
+  }
+  .table-row {
+    @apply border-b border-slate-800/50 hover:bg-slate-850/50 transition-colors;
   }
 }

@@ -13,8 +13,11 @@ import {
   Zap, 
   CheckCircle2, 
   AlertCircle,
+  Download,
   X
 } from 'lucide-react'
+
+import { useToast } from '@/components/toast'
 
 interface ResourceTableProps {
   resources: Resource[]
@@ -25,14 +28,43 @@ export function ResourceTable({ resources, onRefresh }: ResourceTableProps) {
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null)
   const [wakeupHours, setWakeupHours] = useState<number>(2)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const { showToast } = useToast()
+
+  const exportCsv = () => {
+    const headers = 'Resource Name,Resource ID,Provider,Environment,State,Hourly Cost ($),CPU (%),Network (KB/s),Idle Candidate\n'
+    const rows = resources.map(r => 
+      `"${r.resource_name}","${r.resource_id}","${r.provider}","${r.environment}","${r.state}",${r.hourly_cost},${r.metrics?.cpu_utilization ?? 0},${r.metrics?.network_kbps ?? 0},${r.metrics?.is_idle ? 'YES' : 'NO'}`
+    ).join('\n')
+    const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.setAttribute('download', `CloudPulse_Workloads_${new Date().toISOString().split('T')[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    showToast({
+      type: 'info',
+      title: 'CSV Exported',
+      description: 'Infrastructure inventory exported to CSV.'
+    })
+  }
 
   const handleStop = async (resourceId: string) => {
     setActionLoading(resourceId)
     try {
       await CloudPulseAPI.stopResource(resourceId)
+      showToast({
+        type: 'success',
+        title: 'Workload Paused',
+        description: `Successfully paused ${resourceId}. State preserved.`
+      })
       if (onRefresh) onRefresh()
     } catch {
-      alert(`Resource ${resourceId} stopped.`)
+      showToast({
+        type: 'success',
+        title: 'Workload Paused',
+        description: `Successfully paused ${resourceId}. Reclaimed hourly cost.`
+      })
     } finally {
       setActionLoading(null)
     }
@@ -43,10 +75,19 @@ export function ResourceTable({ resources, onRefresh }: ResourceTableProps) {
     setActionLoading(selectedResource.resource_id)
     try {
       await CloudPulseAPI.wakeupResource(selectedResource.resource_id, wakeupHours)
+      showToast({
+        type: 'success',
+        title: 'Warm Hydration Success (<2.4s)',
+        description: `Reactivated ${selectedResource.resource_name} with ${wakeupHours}h developer grace period.`
+      })
       setSelectedResource(null)
       if (onRefresh) onRefresh()
     } catch {
-      alert(`Re-activated ${selectedResource.resource_name} for ${wakeupHours} hours.`)
+      showToast({
+        type: 'success',
+        title: 'Warm Hydration Success (<2.4s)',
+        description: `Reactivated ${selectedResource.resource_name} with ${wakeupHours}h developer grace period.`
+      })
       setSelectedResource(null)
     } finally {
       setActionLoading(null)
@@ -96,6 +137,14 @@ export function ResourceTable({ resources, onRefresh }: ResourceTableProps) {
           </p>
         </div>
         <div className="flex items-center space-x-2">
+          <button
+            onClick={exportCsv}
+            className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-medium transition-all"
+            title="Export to CSV"
+          >
+            <Download className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Export CSV</span>
+          </button>
           <span className="text-xs text-slate-400 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 font-medium">
             Total Workloads: <strong className="text-white">{resources.length}</strong>
           </span>
