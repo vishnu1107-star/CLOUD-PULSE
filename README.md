@@ -12,7 +12,7 @@
 ## 🌐 Live Web Portal & Demonstration Links
 
 - **GitHub Repository:** [https://github.com/vishnu1107-star/CLOUD-PULSE](https://github.com/vishnu1107-star/CLOUD-PULSE)
-- **Interactive Web App Portal:** [https://cloudpulse-finops.vercel.app](https://cloudpulse-finops.vercel.app) *(or Vercel Live Deployment)*
+- **Interactive Web App Portal:** [https://marvelous-rugelach-27a627.netlify.app](https://marvelous-rugelach-27a627.netlify.app)
 - **API Swagger Documentation:** `http://localhost:8000/docs`
 
 ---

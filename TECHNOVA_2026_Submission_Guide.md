@@ -15,7 +15,7 @@
 | **Q28** | **Project Presentation (PDF)** | [`ARGUS_Innovators_Presentation.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_Presentation.pdf) | ✅ Sky Blue Theme, 8 Slides, Clean Layout |
 | **Q29** | **Demo Video Link (URL)** | `[Your Google Drive Link for TSM - video.mp4]` | ✅ 2 Min Duration (120.5s), 10.5 MB, Custom TSM Audio |
 | **Q30** | **GitHub Repository Link (URL)** | `https://github.com/vishnu1107-star/CLOUD-PULSE` | ✅ **LIVE ON GITHUB** (Source Code & Core Engine) |
-| **Q31** | **Website / App Link (URL)** | `https://cloudpulse-finops.vercel.app` | ✅ **LIVE WEB APP PORTAL LINK** |
+| **Q31** | **Website / App Link (URL)** | `https://marvelous-rugelach-27a627.netlify.app` | ✅ **LIVE WEB APP PORTAL LINK** |
 
 ---
 
@@ -77,7 +77,7 @@
 * **28. Presentation (PDF):** [`ARGUS_Innovators_Presentation.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_Presentation.pdf)  
 * **29. Demo Video Link:** `[Your Google Drive Link for TSM - video.mp4]`  
 * **30. GitHub Repository Link:** `https://github.com/vishnu1107-star/CLOUD-PULSE`  
-* **31. Website / App Link:** `https://cloudpulse-finops.vercel.app` *(or `https://github.com/vishnu1107-star/CLOUD-PULSE`)*  
+* **31. Website / App Link:** `https://marvelous-rugelach-27a627.netlify.app` *(or `https://github.com/vishnu1107-star/CLOUD-PULSE`)*  
 
 ---
 
