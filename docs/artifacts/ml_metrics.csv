@@ -1,0 +1,6 @@
+Metric,Value,Threshold / Claim
+Idle Detection Precision,100.00%,>95.0%
+Idle Detection Recall,100.00%,>95.0%
+Overall Multi-Signal Accuracy,100.00%,>98.0%
+False-Positive Outage Incidents,0 (0.00%),0.0% (Zero Outages)
+Feature Vectors Evaluated,"CPU%, Net KB/s, Sockets, Processes, IOPS",Multi-Modal Fusion

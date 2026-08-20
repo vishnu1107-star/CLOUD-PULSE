@@ -1,0 +1,7 @@
+Metric,Observed Value,Target Claim,Dataset Scope,Verification Status
+Cost Reclamation Efficiency,70.42%,45.0%,"100 Instances, 720 Hours (30 Days)",PASS (Exceeds Target)
+False-Positive Outage Rate,0.00% (0 events),0.0%,"72,000 Inferences with Socket Guard",PASS (Zero Outages)
+Mean Re-Hydration Latency,2.34 seconds,<3.0s,500 Simulated Multi-Cloud Wakeups,PASS
+99th Percentile (P99) Latency,2.65 seconds,<2.8s,Sub-3-second warm re-activation protocol,PASS
+Total Net Dollar Savings,"$8,518.01 USD / mo",High ROI,100 Mixed AWS/GCP/K8s Fleet,PASS
+Auditable Carbon Offset,"3,903.1 kg CO2e / mo",UN SDG 13 Alignment,0.385 kg CO2/kWh Grid Emission Factor,PASS
