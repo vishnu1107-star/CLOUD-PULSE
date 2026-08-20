@@ -40,7 +40,8 @@ export function Navbar() {
   ]
 
   const toolNav = [
-    { name: 'Predictive Scheduler', href: '/scheduler', icon: Brain, desc: 'AI time-series pre-hydration' },
+    { name: 'ML Model Evidence', href: '/ml-insights', icon: Brain, desc: 'Confusion matrix & 5D ML metrics' },
+    { name: 'Predictive Scheduler', href: '/scheduler', icon: Zap, desc: 'AI time-series pre-hydration' },
     { name: 'Global Topology', href: '/topology', icon: Globe, desc: 'Multi-cloud & multi-region map' },
     { name: 'Snapshot Vault', href: '/vault', icon: ShieldCheck, desc: '30-day point-in-time recovery' },
     { name: 'ROI Calculator', href: '/roi', icon: Calculator, desc: 'Enterprise cost & carbon simulation' },

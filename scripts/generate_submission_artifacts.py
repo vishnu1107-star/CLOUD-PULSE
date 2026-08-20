@@ -43,10 +43,10 @@ def generate_innovation_summary_pdf(output_paths: list[str]):
     story.append(Paragraph("<b>CloudPulse: Autonomous Multi-Cloud FinOps & Instant Hydration Engine</b>", title_style))
     story.append(Paragraph(
         "<b>Track:</b> AI Infrastructure & FinOps &nbsp;|&nbsp; "
-        "<b>Team:</b> ARGUS Innovators &nbsp;|&nbsp; "
+        "<b>Team:</b> ARGUS INNOVATORS &nbsp;|&nbsp; "
         "<b>Leader:</b> L. Vishnu Priya &nbsp;|&nbsp; "
-        "<b>Members:</b> Harini Sri B K, Tharagai V, Vishalni S &nbsp;|&nbsp; "
-        "<b>Host:</b> TSM-TECHNOVA 2026", 
+        "<b>Members:</b> Harini Sri B K, Tharagai V, Vishalini S &nbsp;|&nbsp; "
+        "<b>Host:</b> Thiagarajar School of Management (TSM), Madurai", 
         meta_style
     ))
 
