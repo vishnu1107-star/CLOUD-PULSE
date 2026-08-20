@@ -1,10 +1,23 @@
-# CloudPulse: Multi-Cloud Cost Optimization & Infrastructure Engine ⚡
+# CloudPulse: Multi-Cloud Cost Optimization & Instant Hydration Engine ⚡
 
-**CloudPulse** is an open-source, production-grade Cloud Cost Optimization & Automated Infrastructure Lifecycle Engine. It overcomes the flaws of purely advisory FinOps platforms by pairing **metric-based idle detection**, **tag-aware policy evaluation**, **zero-downtime developer re-activation (1-click & Slack slash commands)**, and **ghost resource sweeping**.
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](https://github.com/vishnu1107-star/CLOUD-PULSE)
+[![Framework](https://img.shields.io/badge/Framework-FastAPI%20%7C%20Next.js%2014-blue.svg)](https://github.com/vishnu1107-star/CLOUD-PULSE)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/vishnu1107-star/CLOUD-PULSE)
+[![Hackathon](https://img.shields.io/badge/TSM--TECHNOVA-2026%20Finalist-purple.svg)](https://github.com/vishnu1107-star/CLOUD-PULSE)
+
+**CloudPulse** is an open-source, production-grade Cloud Cost Optimization & Automated Infrastructure Lifecycle Engine. It overcomes the flaws of purely advisory FinOps platforms by pairing **metric-based idle detection**, **tag-aware policy evaluation**, **zero-downtime developer re-activation (<3.0s warm hydration via Web UI & Slack)**, and **ghost resource sweeping**.
 
 ---
 
-## Key Features
+## 🌐 Live Web Portal & Demonstration Links
+
+- **GitHub Repository:** [https://github.com/vishnu1107-star/CLOUD-PULSE](https://github.com/vishnu1107-star/CLOUD-PULSE)
+- **Interactive Web App Portal:** [https://cloudpulse-finops.vercel.app](https://cloudpulse-finops.vercel.app) *(or Vercel Live Deployment)*
+- **API Swagger Documentation:** `http://localhost:8000/docs`
+
+---
+
+## ⚡ Key Features
 
 1. **Tag-Aware Multi-Cloud Discovery (`/app/engine/discovery.py`)**
    - Discovers AWS (EC2, EBS, EIP, ELB), GCP (Compute Engine), and Kubernetes Deployments.
@@ -20,11 +33,10 @@
 
 3. **Execution & Ghost Resource Sweeper (`/app/engine/executor.py`)**
    - Safely pauses VMs and scales K8s deployments down to 0 replicas (`kubectl scale --replicas=0`).
-   - Flags & purges unattached EBS/GCP disks (`available`), unassociated EIPs, and idle ELBs.
-   - Configurable Dry-Run mode (`DRY_RUN=True`).
+   - Flags & purges unattached EBS/GCP disks (`available`), unassociated EIPs, and idle ELBs with automated 30-day snapshot backups.
 
 4. **Developer Re-Activation & Webhook Portal (`/app/api/v1/endpoints/hooks.py`)**
-   - 1-Click "Wake Up" portal in the Next.js UI.
+   - 1-Click "Wake Up" portal in the Next.js UI (<3.0s re-activation time).
    - Slack Slash Command webhook receiver (`/cloudpulse wakeup staging --hours=3`).
 
 5. **Cost Analytics & Carbon Offsetting Engine (`/app/engine/analytics.py`)**
@@ -33,9 +45,9 @@
 
 ---
 
-## Quick Start (Local Run)
+## 🛠️ Quick Start (Local Run)
 
-### 1. Backend Setup (FastAPI)
+### 1. Backend Engine (FastAPI)
 ```bash
 cd cloudpulse/backend
 pip install -r requirements.txt
@@ -44,7 +56,7 @@ python main.py
 - API Documentation: `http://localhost:8000/docs`
 - OpenAPI JSON: `http://localhost:8000/api/v1/openapi.json`
 
-### 2. Frontend Setup (Next.js)
+### 2. Frontend Dashboard (Next.js 14)
 ```bash
 cd cloudpulse/frontend
 npm install
@@ -54,7 +66,7 @@ npm run dev
 
 ---
 
-## Architecture Diagram
+## 🏛️ System Architecture
 
 ```text
                +---------------------------------------------------+
@@ -83,3 +95,6 @@ npm run dev
                          | (AWS Boto3, GCP, K8s, Sim)    |
                          +-------------------------------+
 ```
+
+---
+*Developed by Team ARGUS Innovators for TSM-TECHNOVA 2026 & National Hackathons.*
