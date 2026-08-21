@@ -196,4 +196,4 @@ cloudpulse/
 ```
 
 ---
-*Developed by Team ARGUS Innovators for TSM-TECHNOVA 2026 (AI Infrastructure / FinOps Track).*
+*CloudPulse — Autonomous Multi-Cloud FinOps & Infrastructure Lifecycle Engine (MIT Licensed).*
