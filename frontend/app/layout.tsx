@@ -24,7 +24,7 @@ export default function RootLayout({
           </main>
           <footer className="border-t border-border bg-surface/40 py-6 text-center text-xs text-slate-500">
             <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-              <p>© 2026 CloudPulse FinOps Engine — Developed by Team ARGUS Innovators for TSM-TECHNOVA 2026.</p>
+              <p>© 2026 CloudPulse FinOps Engine. Autonomous Multi-Cloud Lifecycle Management.</p>
               <div className="flex items-center space-x-3 text-slate-400">
                 <span>FastAPI + Next.js 14</span>
                 <span>•</span>
