@@ -1,9 +1,9 @@
-﻿# 🎯 TSM-TECHNOVA 2026 — 60-Second Judge Q&A Leadership Brief
+# 🎯 EMBRIX'26 VEGATHON — Judge Q&A Leadership Brief
 **Team Name:** ARGUS INNOVATORS  
 **Team Leader:** L. Vishnu Priya  
 **Team Members:** Harini Sri B K, Tharagai V, Vishalini S  
 **Project:** CloudPulse (Autonomous Multi-Cloud FinOps & Instant Hydration Engine)  
-**Track:** AI Infrastructure / Cloud FinOps / Green Tech  
+**Track:** Edge AI & TinyML Track (VEGA Aries IoT Board / THEJAS32 RISC-V SoC)  
 
 > **Purpose:** Plain-language, rehearsed answers for the team to reference during live judge evaluations. Keep answers crisp, confident, and under 30 seconds each.
 

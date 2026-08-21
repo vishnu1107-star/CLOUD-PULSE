@@ -4,7 +4,7 @@
 [![Framework](https://img.shields.io/badge/Framework-FastAPI%20%7C%20Next.js%2014-blue.svg)](https://github.com/vishnu1107-star/CLOUD-PULSE)
 [![AI Engine](https://img.shields.io/badge/AI%20Layer-Isolation%20Forest%20%2B%20Time--Series-purple.svg)](https://github.com/vishnu1107-star/CLOUD-PULSE)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/vishnu1107-star/CLOUD-PULSE)
-[![Hackathon](https://img.shields.io/badge/TSM--TECHNOVA-2026%20Finalist-purple.svg)](https://github.com/vishnu1107-star/CLOUD-PULSE)
+[![Hackathon](https://img.shields.io/badge/EMBRIX'26--VEGATHON-Finalist-purple.svg)](https://github.com/vishnu1107-star/CLOUD-PULSE)
 
 **CloudPulse** is an open-source, AI-powered Multi-Cloud Cost Optimization & Autonomous Infrastructure Lifecycle Engine. It overcomes the fundamental failure modes of advisory FinOps platforms by pairing **unsupervised ML anomaly detection (Isolation Forest)**, **predictive pre-hydration time-series forecasting**, **zero-outage socket gating**, **sub-2.8s warm developer re-activation (Web UI & Slack ChatOps)**, and **autonomous ghost resource sweeping**.
 
@@ -18,18 +18,20 @@
 
 ---
 
-## 📊 Empirically Measured Headline Metrics
+## 📊 Simulated Benchmark Targets
 
-*Benchmark conducted across $N=100$ mixed multi-cloud instances over 720 operating hours (30 days).*
+The figures below come from our internal simulation harness (benchmark_harness.py), not from a live production deployment. We're presenting them transparently as design targets validated in simulation, with real-world validation planned for our pilot phase.
 
-| Metric | Target Claim | Measured / Verified Value | Evaluation Scope & Methodology | Status |
+*Benchmark simulated across $N=100$ mixed multi-cloud instances over 720 operating hours (30 days).*
+
+| Metric | Target Claim | Simulated Value | Evaluation Scope & Methodology | Status |
 | :--- | :---: | :---: | :--- | :---: |
-| **Cost Reclamation** | **45.0%** | **45.2% - 70.4%** | $100$ instances (AWS EC2, GCP GCE, EKS) across 720 hours | ✅ **VERIFIED** |
-| **False-Positive Outages** | **0.0%** | **0.00% (0 Incidents)** | $72,000$ metric inferences with socket & DB lock protection | ✅ **VERIFIED** |
-| **P99 Hydration Latency** | **< 2.80s** | **2.65s (Mean: 2.34s)** | $500$ simulated multi-cloud warm wake-up cycles | ✅ **VERIFIED** |
-| **Idle Detection Accuracy** | **> 98.0%** | **100.0%** | $10,000$ multi-signal telemetry samples evaluated | ✅ **VERIFIED** |
-| **Ghost Storage Purged** | **High ROI** | **$412.50 / month** | Orphaned EBS disks, unassociated EIPs, and unused ELBs | ✅ **VERIFIED** |
-| **Carbon Avoided** | **ESG Target** | **$3,903.1\text{ kg CO}_2\text{e}$** | Standardized grid emission factor ($0.385\text{ kg CO}_2/\text{kWh}$) | ✅ **VERIFIED** |
+| **Cost Reclamation** | **45.0%** | **45.2% - 70.4%** | $100$ instances (AWS EC2, GCP GCE, EKS) across 720 hours | 🎯 **SIMULATED** |
+| **False-Positive Outages** | **0.0%** | **0.00% (0 Incidents)** | $72,000$ metric inferences with socket & DB lock protection | 🎯 **SIMULATED** |
+| **P99 Hydration Latency** | **< 2.80s** | **2.65s (Mean: 2.34s)** | $500$ simulated multi-cloud warm wake-up cycles | 🎯 **SIMULATED** |
+| **Idle Detection Accuracy** | **> 98.0%** | **100.0%** | $10,000$ multi-signal telemetry samples evaluated | 🎯 **SIMULATED** |
+| **Ghost Storage Purged** | **High ROI** | **$412.50 / month** | Orphaned EBS disks, unassociated EIPs, and unused ELBs | 🎯 **SIMULATED** |
+| **Carbon Avoided** | **ESG Target** | **$3,903.1\text{ kg CO}_2\text{e}$** | Standardized grid emission factor ($0.385\text{ kg CO}_2/\text{kWh}$) | 🎯 **SIMULATED** |
 
 ---
 
@@ -196,4 +198,4 @@ cloudpulse/
 ```
 
 ---
-*CloudPulse — Autonomous Multi-Cloud FinOps & Infrastructure Lifecycle Engine (MIT Licensed).*
+*Developed by Team ARGUS Innovators for EMBRIX'26 VEGATHON (Edge AI & TinyML Track — VEGA Aries IoT Board).*
