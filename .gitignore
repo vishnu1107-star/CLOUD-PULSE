@@ -37,6 +37,11 @@ env/
 pre_filter_bench
 pre_filter_bench.exe
 
+# Generator Scripts & Slides Working Files
+generate_*.py
+scripts/
+*.pptx
+
 # OS / IDE
 .DS_Store
 Thumbs.db
