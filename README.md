@@ -71,9 +71,11 @@
 - Models diurnal and harmonic weekly activity trends per engineering team.
 - Automatically initiates warm pre-hydration 30 minutes before regular developer login windows (e.g. 08:30 AM), eliminating cold-start developer friction completely.
 
-### 3. C-DAC VEGA RISC-V Edge Hardware Collector (`app/services/vega_riscv_driver.py`)
-- Acts as an out-of-band, tamper-proof **Hardware Root-of-Trust** and low-overhead telemetry collector for hybrid and on-premise Kubernetes clusters.
-- Captures physical power draw (Watts), core thermal metrics, and direct socket connection state without adding host OS agent overhead.
+### 3. C-DAC VEGA RISC-V Edge Hardware Pre-Filter (`firmware/` & `app/services/vega_riscv_driver.py`)
+- Deployed on **C-DAC VEGA Aries v3.0 IoT Board** (**THEJAS32 SoC, VEGA ET1031 RISC-V 32-bit Core @ 100 MHz, 256 KB SRAM**).
+- **Edge Decimation (85%-95% Bandwidth Reduction)**: Evaluates multi-signal telemetry locally in embedded C in microseconds (< 256 bytes SRAM footprint).
+- **Zero-Outage Socket Guard**: Blocks false-positive idle signals at the hardware edge if active sockets or database locks exist.
+- **Selective Uplink**: Only forwards sustained `CANDIDATE_IDLE` states upstream to the cloud ML engine.
 
 ---
 
@@ -86,6 +88,7 @@
 | **Zero-Outage Socket Guard** | ❌ (Shuts down busy jobs) | ❌ (N/A) | ❌ (N/A) | ❌ (Spot disruptions) | ✅ **0.0% False Outages** |
 | **Predictive Pre-Hydration** | ❌ | ❌ | ❌ | ❌ | ✅ **Diurnal Forecaster** |
 | **Sub-3s Instant Re-Activation** | ❌ (30-60 min manual ops) | ❌ (Manual ticketing) | ❌ | ❌ | ✅ **<2.8s (Web & Slack)** |
+| **Edge Hardware Pre-Filter** | ❌ | ❌ | ❌ | ❌ | ✅ **VEGA RISC-V (THEJAS32)** |
 | **Cross-Cloud & K8s Coverage** | ⚠️ (AWS only) | ✅ (AWS/GCP/Azure) | ⚠️ (Kubernetes only) | ✅ (Multi-cloud) | ✅ **AWS + GCP + K8s** |
 | **Ghost Resource Reaper** | ❌ | ⚠️ (Reports only) | ❌ | ❌ | ✅ **Auto-Purge & Vault** |
 | **Open Source & Extensible** | ⚠️ (CloudFormation) | ❌ (Proprietary SaaS) | ⚠️ (Open-core) | ❌ (Proprietary SaaS) | ✅ **MIT Open Source** |
@@ -111,9 +114,25 @@
 
 ## 🛠️ Quick Start & Local Run
 
-### 1. Backend Engine (FastAPI + ML Engine)
+### 1. Edge Pre-Filter Firmware (VEGA RISC-V / Generic C99)
 ```bash
-cd cloudpulse/backend
+cd firmware
+
+# On Windows (MSVC)
+build_and_run.bat
+
+# On Linux / macOS (GCC)
+make && ./pre_filter_bench
+
+# Cross-compile for VEGA ET1031 RISC-V
+make ARCH=riscv CROSS_COMPILE=riscv32-unknown-elf-
+```
+- Empirical Micro-benchmark: Evaluates 1,000,000 telemetry windows in 6.26 ms (~6.26 ns/eval on host desktop; ~350 ns / 35 cycles estimated on 100 MHz VEGA ET1031).
+- Memory Footprint: < 256 bytes RAM (< 0.1% of 256 KB SRAM).
+
+### 2. Backend Engine (FastAPI + ML Engine)
+```bash
+cd backend
 pip install -r requirements.txt
 
 # Run ML training & verification suite
@@ -127,9 +146,9 @@ python main.py
 - API Documentation: `http://localhost:8000/docs`
 - OpenAPI Specification: `http://localhost:8000/api/v1/openapi.json`
 
-### 2. Frontend Dashboard (Next.js 14)
+### 3. Frontend Dashboard (Next.js 14)
 ```bash
-cd cloudpulse/frontend
+cd frontend
 npm install
 npm run dev
 ```
@@ -141,6 +160,14 @@ npm run dev
 
 ```
 cloudpulse/
+├── firmware/                       # Edge Telemetry Pre-Filter (VEGA Aries / THEJAS32 RISC-V)
+│   ├── pre_filter.h                # Telemetry structs, threshold bounds, and API
+│   ├── pre_filter.c                # Slide-ready 12-line classification & window filter
+│   ├── main.c                      # Functional scenarios & 1M-cycle timing benchmark runner
+│   ├── timing_benchmark_results.txt# Real empirical benchmark log file
+│   ├── Makefile                    # GCC / RISC-V cross-compilation build file
+│   ├── build_and_run.bat           # Windows MSVC build & run script
+│   └── README.md                   # Hardware spec, memory/timing budget & test report
 ├── backend/
 │   ├── app/
 │   │   ├── api/v1/endpoints/       # FastAPI Routes (Resources, Ghost, ML, Hooks, Policies, Analytics)
