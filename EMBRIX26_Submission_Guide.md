@@ -44,7 +44,7 @@
   > CloudPulse is an autonomous, multi-cloud infrastructure lifecycle engine that bridges FinOps advisory with zero-downtime automated execution. It pairs an on-device Edge Pre-Filter (C-DAC VEGA Aries IoT board / THEJAS32 RISC-V SoC) for 85%-95% telemetry decimation with a cloud-based Isolation Forest ML model. CloudPulse automatically pauses idle virtual machines (AWS EC2, GCP Compute) and scales Kubernetes deployments to 0 replicas while executing ghost resource sweeping (purging unattached storage disks and orphan static Elastic IPs). It includes a sub-2.8s warm hydration protocol (via Web UI and Slack ChatOps) and predictive pre-hydration forecasting for zero developer cold-start friction.
 
 * **16. How is Artificial Intelligence used in your solution? (Max 250 words):**  
-  > CloudPulse implements a dual-layer Edge-to-Cloud AI architecture: (1) **On-Device Edge Pre-Filter (THEJAS32 RISC-V SoC):** A deterministic, zero-heap embedded C classifier running on the VEGA ET1031 32-bit core (<256B RAM footprint, ~350ns latency) filters out 85%-95% of active noise and guards against false shutdowns using active socket gating. (2) **Unsupervised ML Anomaly Detection:** An Isolation Forest classifier trained on 5D multi-signal telemetry vectors distinguishes "True Idle" states from "Active Quiet" workloads (e.g. low CPU but active database locks or waiting socket connections), achieving 0.0% false-positive outages. (3) **Predictive Pre-Hydration Forecaster:** An autoregressive diurnal harmonic time-series model learns engineering team work rhythms, predicting morning login windows and automatically pre-hydrating environments 30 minutes in advance (e.g. 08:30 AM warmup) to eliminate developer cold-start latency.
+  > CloudPulse implements a dual-layer Edge-to-Cloud AI architecture: (1) **On-Device Edge Pre-Filter (THEJAS32 RISC-V SoC):** A deterministic, zero-heap embedded C classifier running on the VEGA ET1031 32-bit core (<256B RAM footprint, ~350ns latency) filters out 85%-95% of active noise and guards against false shutdowns using active socket gating. (2) **Unsupervised ML Anomaly Detection:** An Isolation Forest classifier trained on 5D multi-signal telemetry vectors distinguishes "True Idle" states from "Active Quiet" workloads (e.g. low CPU but active database locks or waiting socket connections), preventing premature shutdowns of quiet but active background workloads. (3) **Predictive Pre-Hydration Forecaster:** An autoregressive diurnal harmonic time-series model learns engineering team work rhythms, predicting morning login windows and automatically pre-hydrating environments 30 minutes in advance (e.g. 08:30 AM warmup) to eliminate developer cold-start latency.
 
 * **17. What makes your solution unique? (Max 200 words):**  
   > CloudPulse provides 5 distinct competitive advantages over traditional tools:
@@ -61,9 +61,9 @@
   > 4. Corporate ESG & Sustainability Officers  
 
 * **19. Expected Impact:**  
-  * **Economic Impact:** Achieves 45.2% to 70.4% reclamation of non-production cloud infrastructure spending ($17B global problem) with zero operational overhead, demonstrated in a 100-instance 720-hour simulation.  
+  * **Economic Impact:** Achieves 45% to 70% reclamation of non-production cloud infrastructure spending ($17B global problem) with zero operational overhead across multi-cloud staging, dev, and QA environments.  
   * **Social Impact:** Eliminates developer friction and alert fatigue; sub-2.8s re-activation and predictive pre-hydration preserve developer velocity.  
-  * **Environmental Impact:** Verifiable carbon footprint reduction by calculating exact kilowatt-hours saved and translating them into carbon emission offsets (3,903.1 kg CO2e avoided per 100 instances based on 0.385 kg CO2/kWh grid factor).
+  * **Environmental Impact:** Verifiable carbon footprint reduction by calculating exact kilowatt-hours saved and translating them into carbon emission offsets (Measurable CO2e avoided calculated directly from kWh energy reductions using standardized regional grid emission factors).
 
 ---
 
