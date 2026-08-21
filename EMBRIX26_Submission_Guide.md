@@ -11,8 +11,8 @@
 
 | Deliverable # | Document / Asset | File Path / Link | Compliance Status |
 | :---: | :--- | :--- | :--- |
-| **Q27** | **Innovation Summary (PDF)** | [`ARGUS_Innovators_InnovationSummary.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_InnovationSummary.pdf) | ✅ Times New Roman 12pt, 1.5 Spacing, Justified, <250 Words |
-| **Q28** | **Project Presentation (PDF)** | [`ARGUS_Innovators_Presentation.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_Presentation.pdf) | ✅ Sky Blue Theme, 8 Slides, Clean Layout |
+| **Q27** | **Innovation Summary (PDF)** | [`CloudPulse_InnovationSummary.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/CloudPulse_InnovationSummary.pdf) | ✅ Times New Roman 12pt, 1.5 Spacing, Justified, <250 Words |
+| **Q28** | **Project Presentation (PDF)** | [`CloudPulse_Presentation.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/CloudPulse_Presentation.pdf) | ✅ Sky Blue Theme, 8 Slides, Clean Layout |
 | **Q29** | **Demo Video Link (URL)** | `[Your Google Drive Link for CloudPulse Video]` | ✅ 2 Min Duration (120s), ~11 MB, Sub-2.8s Hydration & VEGA Edge Demo |
 | **Q30** | **GitHub Repository Link (URL)** | `https://github.com/vishnu1107-star/CLOUD-PULSE` | ✅ **LIVE ON GITHUB** (Source Code, Embedded C Firmware & Core Engine) |
 | **Q31** | **Website / App Link (URL)** | `https://marvelous-rugelach-27a627.netlify.app` | ✅ **LIVE WEB APP PORTAL LINK** |
@@ -81,8 +81,8 @@
 
 ### SECTION 5 – Uploads & Links
 
-* **27. Innovation Summary (PDF):** [`ARGUS_Innovators_InnovationSummary.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_InnovationSummary.pdf)  
-* **28. Presentation (PDF):** [`ARGUS_Innovators_Presentation.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/ARGUS_Innovators_Presentation.pdf)  
+* **27. Innovation Summary (PDF):** [`CloudPulse_InnovationSummary.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/CloudPulse_InnovationSummary.pdf)  
+* **28. Presentation (PDF):** [`CloudPulse_Presentation.pdf`](file:///c:/Users/dELL/OneDrive/Desktop/main-2/cloudpulse/CloudPulse_Presentation.pdf)  
 * **29. Demo Video Link:** `[Your Google Drive Link for CloudPulse Video]`  
 * **30. GitHub Repository Link:** `https://github.com/vishnu1107-star/CLOUD-PULSE`  
 * **31. Website / App Link:** `https://marvelous-rugelach-27a627.netlify.app`  
