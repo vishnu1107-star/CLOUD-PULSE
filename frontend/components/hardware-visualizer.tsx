@@ -38,14 +38,14 @@ export function HardwareVisualizer() {
             <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">01. Edge Compute Core</span>
             <Cpu className="w-4 h-4 text-cyan-400" />
           </div>
-          <h4 className="text-base font-extrabold text-white">THEJAS32 / ARIES SoC</h4>
+          <h4 className="text-base font-extrabold text-white">THEJAS32 / ARIES v3.0 SoC</h4>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Runs CloudPulse telemetry daemon compiled natively on 32-bit RISC-V (RV32IM) architecture. Executes local rolling mathematical averages with zero cloud overhead.
+            Runs CloudPulse lightweight telemetry pre-filter compiled natively on 32-bit RISC-V (ET1031 core). Decimates 85-95% of active noise in &lt; 350 ns per window.
           </p>
           <div className="text-[11px] font-mono text-cyan-300 bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-            • Clock: 100 MHz<br />
+            • Clock: 100 MHz (ET1031 Core)<br />
             • ISA: RV32IM RISC-V<br />
-            • RAM: 256 MB On-Board
+            • SRAM: 256 KB On-Chip (&lt;256B footprint)
           </div>
         </div>
 
@@ -94,10 +94,11 @@ export function HardwareVisualizer() {
         <div className="flex items-center space-x-3 text-slate-500 font-mono text-[11px]">
           <span>UART0: 115200 baud</span>
           <span>•</span>
-          <span>Firmware: v1.0.4-riscv</span>
+          <span>Firmware: v1.2-edge (THEJAS32)</span>
         </div>
       </div>
 
     </div>
   )
 }
+
