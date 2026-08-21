@@ -23,9 +23,9 @@
 
 ### ⚡ 2. Engineering & Architecture
 
-#### Q3: "What happens if the C-DAC VEGA RISC-V hardware isn't physically connected at demo time?"
+#### Q3: "What happens if the C-DAC VEGA Aries hardware isn't physically connected at demo time?"
 * **Plain-Language Answer (20s):**
-  > "CloudPulse has a dual-mode driver architecture (`app/services/vega_riscv_driver.py`). When the physical C-DAC VEGA / ARIES board is connected via UART or TCP, it captures physical power draw (<5W) and tamper-proof socket telemetry. If offline, the driver automatically operates in high-fidelity hardware emulation mode, so no demo workflows or API endpoints are disrupted."
+  > "CloudPulse has a dual-mode driver architecture (`app/services/vega_riscv_driver.py`). When the physical C-DAC VEGA Aries board (THEJAS32 SoC / VEGA ET1031 RISC-V core) is connected via UART or TCP, it captures physical power draw (<5W) and tamper-proof socket telemetry. If offline, the driver automatically operates in high-fidelity hardware emulation mode, so no demo workflows or API endpoints are disrupted."
 
 #### Q4: "How does the Sub-2.8s Instant Hydration work?"
 * **Plain-Language Answer (20s):**
@@ -57,7 +57,7 @@
 
 #### Q10: "What is your Business Model & GTM Strategy?"
 * **Plain-Language Answer (20s):**
-  > "A 3-tier Product-Led Growth (PLG) SaaS model: **Tier 1 Community (Free & Open Source)** up to 10 nodes to drive developer viral adoption; **Tier 2 Scale-Up ($12/node/mo or 15% of verified savings)** with full ML & ChatOps; and **Tier 3 Enterprise ($24/node/mo)** with multi-tenant RBAC, custom SLAs, and C-DAC RISC-V on-prem integration."
+  > "A 3-tier Product-Led Growth (PLG) SaaS model: **Tier 1 Community (Free & Open Source)** up to 10 nodes to drive developer viral adoption; **Tier 2 Scale-Up ($12/node/mo or 15% of verified savings)** with full ML & ChatOps; and **Tier 3 Enterprise ($24/node/mo)** with multi-tenant RBAC, custom SLAs, and C-DAC THEJAS32 RISC-V edge on-prem integration."
 
 ---
 
