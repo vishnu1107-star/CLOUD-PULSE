@@ -12,7 +12,8 @@ import {
   ArrowRight,
   Sliders,
   ShieldCheck,
-  FlaskConical
+  FlaskConical,
+  Zap
 } from 'lucide-react'
 
 export function LandingValidation() {
@@ -45,24 +46,26 @@ export function LandingValidation() {
         </p>
       </div>
 
-      {/* 3 Validated Headline Proof Pillars */}
+      {/* 3 Validated Headline Proof Pillars with Exact Prompt Captions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         
         {/* Metric 1: Savings */}
-        <div className="p-6 rounded-2xl bg-slate-900/80 border border-emerald-500/40 space-y-3 relative overflow-hidden shadow-lg">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
-              [Benchmarked & Pilot]
-            </span>
-            <DollarSign className="w-5 h-5 text-emerald-400" />
-          </div>
+        <div className="p-6 rounded-2xl bg-slate-900/80 border border-emerald-500/40 space-y-3 relative overflow-hidden shadow-lg flex flex-col justify-between">
           <div>
-            <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              45–70% <span className="text-emerald-400 text-lg font-bold">Reclaimed</span>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                [Benchmarked & Pilot]
+              </span>
+              <DollarSign className="w-5 h-5 text-emerald-400" />
             </div>
-            <p className="text-xs text-slate-300 mt-1 font-medium">
-              <strong className="text-emerald-400">$8,518 / month</strong> saved per 100 non-prod instances.
-            </p>
+            <div className="mt-3">
+              <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                45–70% <span className="text-emerald-400 text-lg font-bold">Reclaimed</span>
+              </div>
+              <p className="text-xs text-emerald-300 mt-2 font-semibold italic bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-500/20">
+                “Savings: 45–70% reclaimed → $8,518/month per 100 instances.”
+              </p>
+            </div>
           </div>
           <div className="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
             <span>Annual ROI Impact:</span>
@@ -71,20 +74,22 @@ export function LandingValidation() {
         </div>
 
         {/* Metric 2: Latency */}
-        <div className="p-6 rounded-2xl bg-slate-900/80 border border-cyan-500/40 space-y-3 relative overflow-hidden shadow-lg">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30">
-              [Benchmarked]
-            </span>
-            <Clock className="w-5 h-5 text-cyan-400" />
-          </div>
+        <div className="p-6 rounded-2xl bg-slate-900/80 border border-cyan-500/40 space-y-3 relative overflow-hidden shadow-lg flex flex-col justify-between">
           <div>
-            <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-mono">
-              2.34s <span className="text-cyan-400 text-lg font-bold">Latency</span>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30">
+                [Benchmarked]
+              </span>
+              <Clock className="w-5 h-5 text-cyan-400" />
             </div>
-            <p className="text-xs text-slate-300 mt-1 font-medium">
-              Mean warm re-activation time across 1,000 automated runs.
-            </p>
+            <div className="mt-3">
+              <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-mono">
+                2.34s <span className="text-cyan-400 text-lg font-bold">Latency</span>
+              </div>
+              <p className="text-xs text-cyan-300 mt-2 font-semibold italic bg-cyan-950/40 p-2.5 rounded-lg border border-cyan-500/20">
+                “Hydration latency: 2.34s mean re‑activation.”
+              </p>
+            </div>
           </div>
           <div className="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
             <span>Developer Wait Time:</span>
@@ -93,20 +98,22 @@ export function LandingValidation() {
         </div>
 
         {/* Metric 3: Carbon Offset */}
-        <div className="p-6 rounded-2xl bg-slate-900/80 border border-violet-500/40 space-y-3 relative overflow-hidden shadow-lg">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-violet-500/20 text-violet-300 font-bold border border-violet-500/30">
-              [Design Target]
-            </span>
-            <Leaf className="w-5 h-5 text-violet-400" />
-          </div>
+        <div className="p-6 rounded-2xl bg-slate-900/80 border border-violet-500/40 space-y-3 relative overflow-hidden shadow-lg flex flex-col justify-between">
           <div>
-            <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-mono">
-              3,903 kg <span className="text-violet-400 text-lg font-bold">CO₂e</span>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-violet-500/20 text-violet-300 font-bold border border-violet-500/30">
+                [Design Target]
+              </span>
+              <Leaf className="w-5 h-5 text-violet-400" />
             </div>
-            <p className="text-xs text-slate-300 mt-1 font-medium">
-              Carbon emissions avoided monthly per 100 non-prod VMs.
-            </p>
+            <div className="mt-3">
+              <div className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-mono">
+                3,903 kg <span className="text-violet-400 text-lg font-bold">CO₂e</span>
+              </div>
+              <p className="text-xs text-violet-300 mt-2 font-semibold italic bg-violet-950/40 p-2.5 rounded-lg border border-violet-500/20">
+                “Carbon offset: 3,903 kg CO₂e avoided monthly.”
+              </p>
+            </div>
           </div>
           <div className="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
             <span>EPA eGRID Factor:</span>
@@ -116,12 +123,62 @@ export function LandingValidation() {
 
       </div>
 
+      {/* Visual ROI Comparison Chart (Before vs After CloudPulse) */}
+      <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-bold text-white flex items-center space-x-2">
+              <BarChart3 className="w-4 h-4 text-emerald-400" />
+              <span>Comparative Spend Breakdown: Unmanaged vs. CloudPulse Reclaimed</span>
+            </h3>
+            <p className="text-xs text-slate-400">100-node standard engineering cluster with 68% off-hours ratio</p>
+          </div>
+          <span className="text-[11px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+            -$8,518 Net Saved Monthly
+          </span>
+        </div>
+
+        {/* Visual Bar Chart */}
+        <div className="space-y-3 pt-2">
+          
+          {/* Bar 1: Unmanaged */}
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs font-semibold">
+              <span className="text-slate-400">Unmanaged Cloud Spend (24/7 Running):</span>
+              <span className="text-red-400 font-mono">$14,016 / mo (100%)</span>
+            </div>
+            <div className="w-full h-7 rounded-lg bg-slate-800 flex overflow-hidden">
+              <div className="bg-gradient-to-r from-red-600 to-rose-500 h-full w-[100%] flex items-center px-3 text-[11px] font-bold text-white">
+                Gross Unmanaged Cloud Spend ($14,016/mo)
+              </div>
+            </div>
+          </div>
+
+          {/* Bar 2: With CloudPulse */}
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs font-semibold">
+              <span className="text-slate-400">With CloudPulse Autonomous Control:</span>
+              <span className="text-emerald-400 font-mono">$5,498 / mo (39.2% retained)</span>
+            </div>
+            <div className="w-full h-7 rounded-lg bg-slate-800 flex overflow-hidden">
+              <div className="bg-slate-700 h-full w-[39.2%] flex items-center px-3 text-[11px] font-bold text-slate-300" title="Active Compute">
+                Active Compute ($5,498)
+              </div>
+              <div className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-[60.8%] flex items-center justify-end px-3 text-[11px] font-extrabold text-slate-950 animate-pulse" title="Reclaimed Spend">
+                Reclaimed Savings ($8,518/mo)
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
       {/* Interactive Live ROI Simulator Bar & Slider */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div>
             <h3 className="text-base font-bold text-white flex items-center space-x-2">
-              <BarChart3 className="w-4 h-4 text-emerald-400" />
+              <Sliders className="w-4 h-4 text-cyan-400" />
               <span>Interactive ROI & Carbon Abatement Simulator</span>
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">

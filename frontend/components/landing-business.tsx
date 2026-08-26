@@ -10,7 +10,8 @@ import {
   Rocket, 
   ShieldCheck, 
   Layers,
-  ArrowRight
+  ArrowRight,
+  PieChart
 } from 'lucide-react'
 
 export function LandingBusiness() {
@@ -76,8 +77,8 @@ export function LandingBusiness() {
       </div>
 
       {/* Market Sizing Snapshot (TAM / SAM / SOM) */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 space-y-5 shadow-xl">
-        <div className="flex items-center justify-between">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 space-y-6 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="space-y-1">
             <h3 className="text-base font-bold text-white flex items-center space-x-2">
               <TrendingUp className="w-4 h-4 text-purple-400" />
@@ -86,8 +87,54 @@ export function LandingBusiness() {
             <p className="text-xs text-slate-400">Total Addressable Market, Serviceable Market, and Year 1-2 Targets</p>
           </div>
           <span className="text-[11px] font-mono text-purple-300 bg-purple-500/15 px-2.5 py-1 rounded-full border border-purple-500/25">
-            $600B+ Public Cloud TAM
+            $600B+ Public Cloud Ecosystem
           </span>
+        </div>
+
+        {/* Visual Concentric Rings / Funnel Representation */}
+        <div className="p-5 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
+          
+          {/* Visual Concentric Circles */}
+          <div className="relative w-48 h-48 flex items-center justify-center shrink-0">
+            {/* TAM Outer Circle */}
+            <div className="w-48 h-48 rounded-full border-2 border-purple-500/40 bg-purple-950/20 flex items-center justify-center p-3">
+              {/* SAM Middle Circle */}
+              <div className="w-32 h-32 rounded-full border-2 border-cyan-500/50 bg-cyan-950/30 flex items-center justify-center p-3">
+                {/* SOM Inner Circle */}
+                <div className="w-16 h-16 rounded-full border-2 border-emerald-400 bg-emerald-500/30 flex items-center justify-center shadow-lg shadow-emerald-500/30 animate-pulse">
+                  <span className="text-[10px] font-mono font-bold text-white">SOM</span>
+                </div>
+              </div>
+            </div>
+            <span className="absolute top-1 text-[10px] font-mono text-purple-400 font-bold">TAM: $17B</span>
+            <span className="absolute top-9 text-[10px] font-mono text-cyan-300 font-bold">SAM: $5B</span>
+          </div>
+
+          {/* Funnel Explanatory Legend */}
+          <div className="space-y-2.5 flex-1 text-xs">
+            <div className="flex items-center space-x-3 p-2.5 rounded-lg bg-slate-900 border border-purple-500/20">
+              <span className="w-3 h-3 rounded-full bg-purple-500 shrink-0" />
+              <div>
+                <strong className="text-white font-mono">TAM ($17 Billion):</strong>{' '}
+                <span className="text-slate-400">Total global non-prod compute & orphan storage waste across all clouds.</span>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3 p-2.5 rounded-lg bg-slate-900 border border-cyan-500/20">
+              <span className="w-3 h-3 rounded-full bg-cyan-400 shrink-0" />
+              <div>
+                <strong className="text-white font-mono">SAM ($5 Billion):</strong>{' '}
+                <span className="text-slate-400">Mid-size AWS and GCP SaaS engineering orgs with $50k-$500k monthly bills.</span>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3 p-2.5 rounded-lg bg-slate-900 border border-emerald-500/20">
+              <span className="w-3 h-3 rounded-full bg-emerald-400 shrink-0" />
+              <div>
+                <strong className="text-white font-mono">SOM ($250K → $1M):</strong>{' '}
+                <span className="text-slate-400">$250K ARR Year 1 (10 early adopter pilots) scaling to $1.0M+ ARR in Year 2.</span>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         {/* Concentric TAM/SAM/SOM Display Cards */}
@@ -148,7 +195,7 @@ export function LandingBusiness() {
                 $250K → $1.0M
               </div>
               <p className="text-xs text-emerald-200 mt-1 font-semibold">
-                $250K ARR Y1 (10 pilots) → $1.0M ARR Y2
+                $250K ARR Y1 (10 adopters) → $1.0M ARR Y2
               </p>
             </div>
             <p className="text-xs text-slate-400 border-t border-slate-800/80 pt-2.5 leading-relaxed">
