@@ -52,7 +52,7 @@ export function LandingHero() {
           </p>
         </div>
 
-        {/* 3 CTA Buttons */}
+        {/* 3 CTA Buttons: Watch Demo | View GitHub | Try Prototype */}
         <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
           
           {/* CTA 1: Watch Demo */}
@@ -64,7 +64,18 @@ export function LandingHero() {
             <span>Watch Demo</span>
           </button>
 
-          {/* CTA 2: Try Prototype */}
+          {/* CTA 2: View GitHub */}
+          <a
+            href="https://github.com/vishnu1107-star/CLOUD-PULSE"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center space-x-2 px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white font-semibold text-sm border border-slate-700/80 shadow-md transition-all transform hover:-translate-y-0.5"
+          >
+            <Github className="w-4 h-4" />
+            <span>View GitHub</span>
+          </a>
+
+          {/* CTA 3: Try Prototype */}
           <button
             onClick={() => scrollToSection('live-prototype-console')}
             className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
@@ -73,17 +84,6 @@ export function LandingHero() {
             <span>Try Prototype</span>
             <ChevronRight className="w-4 h-4" />
           </button>
-
-          {/* CTA 3: View GitHub */}
-          <a
-            href="https://github.com/vishnu1107-star/CLOUD-PULSE-2"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center space-x-2 px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white font-semibold text-sm border border-slate-700/80 shadow-md transition-all transform hover:-translate-y-0.5"
-          >
-            <Github className="w-4 h-4" />
-            <span>View GitHub</span>
-          </a>
         </div>
 
         {/* Headline KPI Snapshot Cards */}
