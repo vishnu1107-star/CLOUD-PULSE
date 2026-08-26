@@ -19,7 +19,8 @@ import {
   Globe,
   Brain,
   ShieldCheck,
-  ChevronDown
+  ChevronDown,
+  FlaskConical
 } from 'lucide-react'
 import { CloudPulseAPI } from '@/lib/api'
 import { useToast } from '@/components/toast'
@@ -40,6 +41,7 @@ export function Navbar() {
   ]
 
   const toolNav = [
+    { name: '🧪 Pilot Results — Week 1', href: '/pilot', icon: FlaskConical, desc: '[Real Pilot] AWS free-tier, Aug 16–22 2026' },
     { name: 'ML Model Evidence', href: '/ml-insights', icon: Brain, desc: 'Confusion matrix & 5D ML metrics' },
     { name: 'Predictive Scheduler', href: '/scheduler', icon: Zap, desc: 'AI time-series pre-hydration' },
     { name: 'Global Topology', href: '/topology', icon: Globe, desc: 'Multi-cloud & multi-region map' },
