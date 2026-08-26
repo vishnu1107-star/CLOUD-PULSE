@@ -25,7 +25,7 @@ export function LandingProblem() {
             <span>The Silent Cloud Crisis</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            The Multi-Billion Dollar Non-Production Drain
+            $17B wasted annually on idle non-prod cloud resources.
           </h2>
         </div>
         <p className="text-xs sm:text-sm text-slate-400 max-w-md">
@@ -53,8 +53,8 @@ export function LandingProblem() {
               <div className="text-5xl sm:text-6xl font-black text-white tracking-tight flex items-baseline">
                 <span className="text-red-400 mr-1">$</span>17,000,000,000
               </div>
-              <p className="text-sm font-semibold text-red-300">
-                $17 Billion Lost Annually in Idle & Orphaned Cloud Compute
+              <p className="text-sm font-bold text-red-300">
+                $17B wasted annually on idle non-prod cloud resources.
               </p>
             </div>
 
@@ -63,7 +63,7 @@ export function LandingProblem() {
               <div className="flex items-center justify-between text-xs text-slate-300 font-medium">
                 <span className="flex items-center space-x-1.5">
                   <CloudOff className="w-4 h-4 text-red-400" />
-                  <span>24/7 Staging Cluster Leakage</span>
+                  <span>24/7 Staging Cluster Leakage (Cloud + Money Drain)</span>
                 </span>
                 <span className="text-red-400 font-mono font-bold">-68% Utility</span>
               </div>
