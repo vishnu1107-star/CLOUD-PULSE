@@ -10,12 +10,13 @@ from app.api.v1.api import api_router
 from app.engine.discovery import DiscoveryEngine
 from app.engine.evaluator import IdleEvaluator
 from app.engine.executor import ActionExecutor
+from app.services.vega_controller import vega_controller
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("cloudpulse")
 
 async def background_metric_evaluation_loop():
-    """Background task loop that periodically evaluates cloud resources."""
+    """Background task loop that periodically evaluates cloud resources and updates VEGA LED."""
     logger.info(f"CloudPulse Background Metric Loop Started (Interval: {settings.EVALUATION_INTERVAL_SECONDS}s)...")
     while True:
         try:
@@ -26,20 +27,48 @@ async def background_metric_evaluation_loop():
                 policy = await evaluator.get_or_create_default_policy()
 
                 evaluations = await evaluator.evaluate_all()
-                if policy.auto_stop_enabled:
-                    for item in evaluations:
-                        if item.get("is_idle") and not item.get("override_active"):
-                            result = await executor.stop_resource(
-                                item["resource_id"],
-                                is_automated=True,
-                                metrics=item.get("metrics")
-            )
 
-            logger.info(
-                "Reclamation result for %s: %s",
-                item["resource_id"],
-                result
-            )
+                for item in evaluations:
+                    is_idle = item.get("is_idle", False)
+
+                    # ----------------------------------------------------------------
+                    # Determine validated state — same logic as resources.py endpoints
+                    # ----------------------------------------------------------------
+                    resource_state = str(item.get("state", "RUNNING")).upper()
+                    if resource_state in ["RECLAIMED", "PAUSED", "STOPPED"] or is_idle:
+                        validated_status = "IDLE"
+                    elif resource_state == "RUNNING" or not is_idle:
+                        validated_status = "RUNNING"
+                    else:
+                        validated_status = "OFF"
+
+                    # ----------------------------------------------------------------
+                    # Drive VEGA physical LED via existing COM6 serial connection.
+                    # This is the integration point: validated backend state → LED.
+                    # set_led_status() sends LED,0 (GREEN) or LED,1 (RED) or LED,-1 (OFF)
+                    # ----------------------------------------------------------------
+                    led_result = vega_controller.set_led_status(validated_status)
+                    logger.info(
+                        "[VEGA LED] resource=%s validated_status=%s led=%s",
+                        item.get("resource_id"),
+                        validated_status,
+                        led_result.get("led_info", led_result.get("status"))
+                    )
+
+                    # ----------------------------------------------------------------
+                    # Existing auto-stop logic — unchanged
+                    # ----------------------------------------------------------------
+                    if policy.auto_stop_enabled and is_idle and not item.get("override_active"):
+                        result = await executor.stop_resource(
+                            item["resource_id"],
+                            is_automated=True,
+                            metrics=item.get("metrics")
+                        )
+                        logger.info(
+                            "Reclamation result for %s: %s",
+                            item["resource_id"],
+                            result
+                        )
         except Exception as e:
             logger.error(f"Error in background evaluation loop: {e}")
 
