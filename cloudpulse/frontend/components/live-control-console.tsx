@@ -28,6 +28,7 @@ import {
   RotateCcw,
   CheckCircle2
 } from 'lucide-react'
+import { DecisionPanel } from '@/components/decision-panel'
 
 export function LiveControlConsole() {
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null)
@@ -226,11 +227,11 @@ export function LiveControlConsole() {
           </button>
 
           <Link
-            href="/roi"
+            href="/vault"
             className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-gray-50 text-gray-700 text-xs font-semibold border border-gray-300 shadow-sm transition-all"
           >
-            <Calculator className="w-3.5 h-3.5 text-blue-600" />
-            <span>ROI Calculator</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+            <span>Snapshot Vault</span>
           </Link>
         </div>
       </div>
@@ -275,6 +276,7 @@ export function LiveControlConsole() {
         </div>
 
         {/* Fleet Table with Interactive Modals */}
+        <DecisionPanel workloads={workloads} />
         <ResourceTable 
           workloads={workloads}
           onInspect={(w) => setInspectWorkload(w)}

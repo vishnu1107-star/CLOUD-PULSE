@@ -35,14 +35,14 @@ function LastUpdatedBar() {
         <div className="flex items-center space-x-2">
           <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-semibold text-[11px]">
             <Zap className="w-3 h-3 text-blue-600" />
-            <span>EMBRIX&apos;26 VEGATHON — Bannari Amman Institute of Technology</span>
+            <span>EMBRIX&apos;26 VEGATHON — Edge AI &amp; TinyML Track</span>
           </span>
           <a
-            href="/pilot"
+            href="/ml-insights"
             className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 font-medium text-[11px] hover:bg-indigo-100 transition-colors"
           >
             <FlaskConical className="w-3 h-3 text-indigo-600" />
-            <span>Simulated Fleet — Validation Results</span>
+            <span>Real VM Trace Replay &amp; Model Validation</span>
           </a>
         </div>
         <div className="flex items-center space-x-1.5 text-gray-500">
@@ -61,6 +61,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <title>CloudPulse | EMBRIX&apos;26 VEGATHON — Edge AI &amp; TinyML Track</title>
+        <meta name="description" content="Autonomous Cloud Waste Reclamation via TinyML anomaly detection on C-DAC VEGA Aries RISC-V edge hardware with reversible Vault recovery." />
+        <meta name="keywords" content="EMBRIX'26 VEGATHON, Edge AI, TinyML, VEGA Aries, RISC-V, Isolation Forest, Cloud Waste Reclamation, FinOps" />
+      </head>
       <body className="bg-[#F9FAFB] text-gray-900 min-h-screen flex flex-col antialiased">
         <ToastProvider>
           <LastUpdatedBar />

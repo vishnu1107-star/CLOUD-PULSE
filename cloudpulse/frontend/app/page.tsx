@@ -2,43 +2,30 @@
 
 import React from 'react'
 
-// 8 Sections Components
 import { LandingHero } from '@/components/landing-hero'
-import { LandingProblem } from '@/components/landing-problem'
 import { LandingSolution } from '@/components/landing-solution'
-import { LandingTechnology } from '@/components/landing-technology'
-import { LandingValidation } from '@/components/landing-validation'
-import { LandingImpact } from '@/components/landing-impact'
-import { LandingBusiness } from '@/components/landing-business'
 import { LiveControlConsole } from '@/components/live-control-console'
+import { HardwareVisualizer } from '@/components/hardware-visualizer'
+import { LandingValidation } from '@/components/landing-validation'
 
 export default function OverviewDashboard() {
   return (
     <div className="space-y-16">
       
-      {/* 1. Hero Section (Landing Page) */}
+      {/* a. Hero Section: Problem statement + "RUN CLOUDPULSE DEMO" button */}
       <LandingHero />
 
-      {/* 2. Problem Section ($17B Waste Infographic) */}
-      <LandingProblem />
-
-      {/* 3. Solution Section (5-Stage Loop & Safety Principle) */}
+      {/* b. The 5-stage loop: Telemetry -> Detect -> Vault -> Reclaim -> Hydrate */}
       <LandingSolution />
 
-      {/* 4. Technology Section (Stack & Competitor Comparison) */}
-      <LandingTechnology />
-
-      {/* 5. Validation Section (ROI Metrics & Empirical Simulator) */}
-      <LandingValidation />
-
-      {/* 6. Impact Section (UN SDG Badges & CO2 Infographic) */}
-      <LandingImpact />
-
-      {/* 7. Business & Scale Section (TAM/SAM/SOM & 90-Day Roadmap) */}
-      <LandingBusiness />
-
-      {/* Live Interactive Control Engine & Workloads Console */}
+      {/* c. Live Decision Console: Embedded directly on the homepage for immediate judge view */}
       <LiveControlConsole />
+
+      {/* d. Edge Hardware Section: VEGA Aries board details, USB connection & live hardware badge */}
+      <HardwareVisualizer />
+
+      {/* e. Detection Model Validation: Empirical proof of Isolation Forest on real VM trace data */}
+      <LandingValidation />
 
     </div>
   )

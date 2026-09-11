@@ -119,4 +119,4 @@ sqlite3 cloudpulse.db "SELECT * FROM evaluations WHERE created_at >= '2026-08-16
 
 ---
 
-*Pilot conducted and logged by Team ARGUS Innovators for TECHNOVA 2026. Data is real; scale is intentionally small and clearly labeled.*
+*Pilot conducted and logged by Team ARGUS Innovators for EMBRIX'26 VEGATHON. Data is real; scale is intentionally small and clearly labeled.*

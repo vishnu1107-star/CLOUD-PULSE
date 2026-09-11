@@ -42,27 +42,13 @@ export function Navbar() {
 
   const mainNav = [
     { name: 'Dashboard', href: '/', icon: Activity },
-    { name: 'Edge Controller', href: '/edge', icon: Cpu },
-    { name: '90s Demo', href: '/demo', icon: Play },
     { name: 'Workloads', href: '/resources', icon: Server },
     { name: 'Snapshot Vault', href: '/vault', icon: ShieldCheck },
-    { name: 'Ghost Reaper', href: '/ghost', icon: Ghost },
-    { name: 'Policies', href: '/policies', icon: Sliders },
-    { name: 'Security', href: '/security', icon: Lock },
+    { name: 'Detection Model Validation', href: '/ml-insights', icon: Brain },
+    { name: 'Edge Hardware & Architecture', href: '/architecture', icon: Layers },
   ]
 
-  const toolNav = [
-    { name: 'ROI Calculator', href: '/roi', icon: Calculator, desc: 'Enterprise cost & payback simulator' },
-    { name: 'Analytics & Trends', href: '/analytics', icon: TrendingUp, desc: 'Financial savings & provider distribution' },
-    { name: 'Predictive Scheduler', href: '/scheduler', icon: Zap, desc: 'AI time-series morning pre-hydration' },
-    { name: 'Live Audit Ledger', href: '/audit', icon: RefreshCw, desc: 'Tamper-evident autonomous action stream' },
-    { name: 'Environmental Impact', href: '/esg', icon: Leaf, desc: 'Scope 2 environmental impact estimate' },
-    { name: 'ML Model Evidence', href: '/ml-insights', icon: Brain, desc: 'Multi-signal 5D ML evaluation metrics' },
-    { name: 'Global Topology', href: '/topology', icon: Globe, desc: 'Multi-cloud & multi-region map' },
-    { name: 'Deep Architecture', href: '/architecture', icon: Layers, desc: '5-stage control loop & RISC-V SoC' },
-    { name: 'Pricing Plans', href: '/pricing', icon: DollarSign, desc: 'Transparent tiered pricing model' },
-    { name: '30-Day Pilot', href: '/pilot', icon: FlaskConical, desc: 'Validation framework & benchmark results' },
-  ]
+  const toolNav: Array<{ name: string; href: string; icon: any; desc: string }> = []
 
   const isToolActive = toolNav.some(t => t.href === pathname)
 
@@ -127,7 +113,7 @@ export function Navbar() {
                     Cloud<span className="text-blue-600">Pulse</span>
                   </span>
                   <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 uppercase tracking-wide">
-                    FinOps SaaS
+                    EMBRIX&apos;26 VEGATHON
                   </span>
                 </div>
               </Link>
@@ -151,46 +137,6 @@ export function Navbar() {
                   )
                 })}
 
-                {/* Intelligence & Tools Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => setToolsOpen(!toolsOpen)}
-                    onBlur={() => setTimeout(() => setToolsOpen(false), 200)}
-                    className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                      isToolActive
-                        ? 'bg-blue-50 text-blue-700 font-bold'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                  >
-                    <span>Intelligence &amp; Tools</span>
-                    <ChevronDown className="w-3 h-3 ml-0.5 opacity-60" />
-                  </button>
-
-                  {toolsOpen && (
-                    <div className="absolute left-0 mt-2 w-72 rounded-2xl bg-white border border-gray-200 p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-100">
-                      {toolNav.map((tool) => {
-                        const Icon = tool.icon
-                        const isActive = pathname === tool.href
-                        return (
-                          <Link
-                            key={tool.name}
-                            href={tool.href}
-                            onClick={() => setToolsOpen(false)}
-                            className={`flex items-start space-x-2.5 p-2.5 rounded-xl transition-colors ${
-                              isActive ? 'bg-blue-50 text-blue-700 font-semibold' : 'hover:bg-gray-50 text-gray-700'
-                            }`}
-                          >
-                            <Icon className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
-                            <div>
-                              <div className="text-xs font-bold">{tool.name}</div>
-                              <div className="text-[10px] text-gray-500">{tool.desc}</div>
-                            </div>
-                          </Link>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
               </nav>
             </div>
 

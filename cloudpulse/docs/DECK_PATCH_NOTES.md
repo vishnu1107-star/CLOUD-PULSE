@@ -1,7 +1,7 @@
-# CloudPulse — TECHNOVA 2026 Deck Patch Notes
+# CloudPulse — EMBRIX'26 VEGATHON Deck Patch Notes
 
 **Purpose:** Exact slide-by-slide instructions to update the pitch deck  
-**Award Track:** AI Innovation Track — TECHNOVA 2026  
+**Award Track:** Edge AI & TinyML Track — EMBRIX'26 VEGATHON  
 **Apply to:** `CloudPulse_Technical_Paper_Presentation.pptx` (or equivalent master deck)  
 **Date:** 2026-08-23  
 
@@ -18,12 +18,12 @@
 
 **Add one line below the subtitle:**
 ```
-Optimized for: AI Innovation Track — TECHNOVA 2026
+Optimized for: Edge AI & TinyML Track — EMBRIX'26 VEGATHON
 ```
 
 **Also add below team name:**
 ```
-Track: AI Innovation | Problem Domain: Cloud FinOps | Technology: Isolation Forest + Predictive ML
+Track: Edge AI & TinyML | Problem Domain: Cloud FinOps | Technology: Isolation Forest + Predictive ML
 ```
 
 **Text clipping check:** Ensure team member names are not clipped; use 12pt minimum font. Verify on 16:9 aspect.
@@ -122,7 +122,7 @@ Add one line to the Enterprise tier description:
 
 **Add one line at the bottom:**
 ```
-CloudPulse — AI Innovation Track | TECHNOVA 2026
+CloudPulse — Edge AI & TinyML Track | EMBRIX'26 VEGATHON
 github.com/vishnu1107-star/CLOUD-PULSE-2 | Live Demo: marvelous-rugelach-27a627.netlify.app
 ```
 
@@ -159,4 +159,4 @@ Run through these checks on every slide in Slide Sorter view:
 | Hydration < 2.8s [Benchmarked] | Slide 3 | ✅ | ✅ B-3 | Dashboard |
 | Cost 40-70% [Design Target] | Slide 3 | ✅ | ✅ D-1 | ROI Calculator |
 | Pilot 96.4% [Real Pilot] | New Pilot Slide | ✅ | ✅ P-1 | /pilot page |
-| Award Track: AI Innovation | Slide 1, Last Slide | ✅ Badge | — | — |
+| Award Track: Edge AI & TinyML | Slide 1, Last Slide | ✅ Badge | — | — |

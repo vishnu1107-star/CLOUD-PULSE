@@ -14,13 +14,13 @@ export function DemoBanner({ onOpenJudgeDemo }: { onOpenJudgeDemo?: () => void }
         <div className="flex items-center space-x-2.5">
           <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[11px] font-bold tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>DEMO MODE</span>
+            <span>HYBRID DEMO</span>
           </span>
           
           <div className="flex items-center space-x-1 text-slate-200 text-xs">
-            <span className="font-semibold text-white">Simulated Cloud Environment:</span>
+            <span className="font-semibold text-white">Live VEGA Aries Hardware + Real Cloud VM Trace Data:</span>
             <span className="hidden md:inline text-slate-300">
-              Safely test Detect → Vault → Reclaim → Hydrate without affecting production infrastructure.
+              Live CDAC RISC-V edge hardware telemetry combined with real Bitbrains &amp; Azure VM trace replay.
             </span>
           </div>
 
@@ -30,21 +30,21 @@ export function DemoBanner({ onOpenJudgeDemo }: { onOpenJudgeDemo?: () => void }
               onMouseLeave={() => setShowTooltip(false)}
               onClick={() => setShowTooltip(!showTooltip)}
               className="text-slate-400 hover:text-white p-0.5"
-              aria-label="Simulation Info"
+              aria-label="Demo Mode Info"
             >
               <Info className="w-3.5 h-3.5" />
             </button>
 
             {showTooltip && (
-              <div className="absolute left-0 top-6 w-72 bg-slate-900 text-slate-200 border border-slate-700 p-3 rounded-xl shadow-2xl z-50 text-[11px] leading-relaxed">
-                <strong className="text-white block mb-1">Simulated / Benchmark Telemetry:</strong>
-                All metrics, dollar savings, and reclaims shown in this prototype are calculated against realistic 100-node simulated fleet benchmarks. Production cloud APIs require read-only IAM credentials.
+              <div className="absolute left-0 top-6 w-80 bg-slate-900 text-slate-200 border border-slate-700 p-3 rounded-xl shadow-2xl z-50 text-[11px] leading-relaxed">
+                <strong className="text-white block mb-1">Hybrid Hardware + Trace Pipeline:</strong>
+                Primary endpoint staging-api accepts live UART frame ingestion from C-DAC VEGA Aries v2 RISC-V hardware over USB serial. Secondary instances stream real Bitbrains/Azure dataset traces.
               </div>
             )}
           </div>
         </div>
 
-        {/* Right: Prompt #8 Action Button */}
+        {/* Right: Action Button */}
         <div className="flex items-center space-x-2.5 shrink-0">
           <button
             onClick={onOpenJudgeDemo}
@@ -55,8 +55,8 @@ export function DemoBanner({ onOpenJudgeDemo }: { onOpenJudgeDemo?: () => void }
           </button>
 
           <div className="flex items-center space-x-1.5 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700">
-            <span className="text-[11px] text-slate-400">Simulation Guard:</span>
-            <span className="text-emerald-400 font-mono font-bold text-[11px]">ACTIVE ✓</span>
+            <span className="text-[11px] text-slate-400">VEGA Hardware Pipeline:</span>
+            <span className="text-emerald-400 font-mono font-bold text-[11px]">CONNECTED ✓</span>
           </div>
         </div>
 

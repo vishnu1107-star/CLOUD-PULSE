@@ -1,7 +1,7 @@
 # CloudPulse — Validation Evidence Ledger
 
 **Project:** CloudPulse Autonomous Multi-Cloud FinOps Engine  
-**Hackathon:** TECHNOVA 2026 — AI Innovation Track  
+**Hackathon:** EMBRIX'26 VEGATHON — Edge AI & TinyML Track  
 **Team:** ARGUS Innovators  
 **Last Updated:** 2026-08-23
 

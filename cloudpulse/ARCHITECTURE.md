@@ -1,7 +1,7 @@
 # CloudPulse — Architecture Document
 
 **Project:** CloudPulse Autonomous Multi-Cloud FinOps Engine  
-**Hackathon:** TECHNOVA 2026 — AI Innovation Track  
+**Hackathon:** EMBRIX'26 VEGATHON — Edge AI & TinyML Track  
 **Version:** 2.0 (Finale-Ready)  
 **Last Updated:** 2026-08-23
 
@@ -152,7 +152,7 @@ Pod rehydration uses pre-pulled images; no registry round-trip.
 | ML Insights | `/ml-insights` | Confusion matrix, feature distributions, model stats |
 | Architecture | `/architecture` | Interactive system diagram |
 | ESG & Carbon | `/esg` | Certificate of Carbon Abatement, UN SDG alignment |
-| Pilot Results | `/pilot` | Real Week 1 pilot data (new for TECHNOVA 2026) |
+| Pilot Results | `/pilot` | Real Week 1 pilot data (new for EMBRIX'26 VEGATHON) |
 | Topology | `/topology` | Multi-cloud resource topology map |
 
 ### Slack ChatOps (`/cloudpulse wakeup <instance-id>`)

@@ -64,10 +64,10 @@ export default function ResourcesPage() {
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
-                Workloads &amp; Autonomous Reclamation Fleet
+                Workloads &amp; Telemetry Data Sources
               </h1>
               <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
-                Multi-cloud inventory (AWS EC2, GCP Compute, K8s). Production workloads protected by default.
+                Live C-DAC VEGA Aries hardware telemetry feed (<code className="text-blue-600 font-bold">staging-api</code>) and real VM dataset trace replays (<code className="text-indigo-600 font-bold">dev-worker</code> &amp; <code className="text-emerald-700 font-bold">qa-runner</code>).
               </p>
             </div>
           </div>

@@ -3,6 +3,7 @@
 export interface WorkloadItem {
   id: string
   name: string
+  resource_type: string
   provider: 'AWS' | 'GCP' | 'K8S'
   region: string
   environment: 'Staging' | 'Dev' | 'QA' | 'Production'
@@ -89,6 +90,7 @@ export const initialWorkloads: WorkloadItem[] = [
   {
     id: 'i-0a1b2c3d',
     name: 'staging-api',
+    resource_type: 'Staging Server',
     provider: 'AWS',
     region: 'us-east-1',
     environment: 'Staging',
@@ -112,6 +114,7 @@ export const initialWorkloads: WorkloadItem[] = [
   {
     id: 'i-0e4f5g6h',
     name: 'dev-worker',
+    resource_type: 'Dev Environment',
     provider: 'AWS',
     region: 'us-west-2',
     environment: 'Dev',
@@ -124,14 +127,15 @@ export const initialWorkloads: WorkloadItem[] = [
     current_cost_day: 9.60,
     potential_savings_day: 7.68,
     hourly_cost: 0.400,
-    state: 'RUNNING',
-    last_activity: '18 hours ago (Off-hours idle)',
+    state: 'RECLAIMED',
+    last_activity: 'Real Bitbrains VM trace replay active (Off-hours idle)',
     recommended_action: 'Safe to reclaim',
-    tags: { Environment: 'Dev', Team: 'Frontend', Project: 'Worker' }
+    tags: { Environment: 'Dev', Team: 'Frontend', DataSource: 'Bitbrains-GWA-T-12' }
   },
   {
     id: 'i-0q7r8s9t',
     name: 'qa-runner',
+    resource_type: 'QA Test Server',
     provider: 'GCP',
     region: 'us-central1',
     environment: 'QA',
@@ -144,14 +148,15 @@ export const initialWorkloads: WorkloadItem[] = [
     current_cost_day: 24.80,
     potential_savings_day: 19.84,
     hourly_cost: 1.033,
-    state: 'RUNNING',
-    last_activity: '2 days ago (Zero job queue)',
+    state: 'RECLAIMED',
+    last_activity: 'Real Azure VM trace replay active (Zero job queue)',
     recommended_action: 'Safe to reclaim',
-    tags: { Environment: 'QA', Team: 'Data-Eng', Project: 'QA-Runner' }
+    tags: { Environment: 'QA', Team: 'Data-Eng', DataSource: 'Azure-Public-Traces' }
   },
   {
     id: 'i-0m5n6o1p',
     name: 'batch-worker',
+    resource_type: 'Batch Processor',
     provider: 'K8S',
     region: 'us-east-2',
     environment: 'Dev',
@@ -164,7 +169,7 @@ export const initialWorkloads: WorkloadItem[] = [
     current_cost_day: 31.50,
     potential_savings_day: 25.20,
     hourly_cost: 1.312,
-    state: 'RUNNING',
+    state: 'RECLAIMED',
     last_activity: '11 hours ago (Zero pods active)',
     recommended_action: 'Safe to reclaim',
     tags: { Environment: 'Dev', Cluster: 'k8s-dev-east', Namespace: 'batch-processing' }
@@ -172,6 +177,7 @@ export const initialWorkloads: WorkloadItem[] = [
   {
     id: 'i-0u3v4w5x',
     name: 'sandbox-01',
+    resource_type: 'Sandbox',
     provider: 'AWS',
     region: 'us-east-1',
     environment: 'Dev',

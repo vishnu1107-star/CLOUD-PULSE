@@ -4,39 +4,43 @@
       "name": "dev-worker",
       "state": "reclaimed",
       "type": "t2.micro",
+      "resource_type": "Dev Environment",
       "feed": "SIMULATED",
       "device_id": "sim-worker-02"
     },
-    "paused_at": 1789116863.2646642
-  },
-  "i-0a1b2c3d": {
-    "state": {
-      "name": "staging-api",
-      "state": "reclaimed",
-      "type": "t2.micro",
-      "feed": "LIVE - VEGA Aries",
-      "device_id": "vega-01"
-    },
-    "paused_at": 1789116863.2639942
+    "paused_at": 1789129317.3741865
   },
   "i-0q7r8s9t": {
     "state": {
       "name": "qa-runner",
       "state": "reclaimed",
       "type": "t2.micro",
+      "resource_type": "QA Test Server",
       "feed": "SIMULATED",
       "device_id": "sim-qa-03"
     },
-    "paused_at": 1789116863.2652059
+    "paused_at": 1789129446.8576314
   },
   "i-0m5n6o1p": {
     "state": {
       "name": "batch-worker",
       "state": "reclaimed",
       "type": "t2.micro",
+      "resource_type": "Batch Processor",
       "feed": "SIMULATED",
       "device_id": "sim-batch-04"
     },
-    "paused_at": 1789116863.265895
+    "paused_at": 1789123777.622983
+  },
+  "i-0a1b2c3d": {
+    "state": {
+      "name": "staging-api",
+      "state": "reclaimed",
+      "type": "t2.micro",
+      "resource_type": "Staging Server",
+      "feed": "LIVE - VEGA Aries",
+      "device_id": "vega-01"
+    },
+    "paused_at": 1789129289.7652972
   }
 }

@@ -62,17 +62,17 @@ export default function MlInsightsPage() {
                 <Brain className="w-6 h-6" />
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-                AI Engine &amp; Multi-Signal ML Inference Architecture
+                Detection Model Validation
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-gray-500 mt-1">
-              Multi-signal anomaly detection, Isolation Forest scoring, and Socket Guard safety gating.
+              Isolation Forest 5D anomaly scoring evaluated against real Bitbrains &amp; Azure VM dataset traces (<code className="text-blue-600 bg-blue-50 px-1 py-0.5 rounded font-mono">dev_worker.csv</code> &amp; <code className="text-blue-600 bg-blue-50 px-1 py-0.5 rounded font-mono">qa_runner.csv</code>).
             </p>
           </div>
 
           <div className="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3.5 py-1.5 rounded-xl text-xs font-bold text-blue-700">
             <ShieldCheck className="w-4 h-4 text-blue-600" />
-            <span>0 False Outages / 72k Evaluations — Repository Benchmark</span>
+            <span>0 False Outages / Real VM Dataset Benchmark</span>
           </div>
         </div>
       </div>

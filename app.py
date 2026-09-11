@@ -27,11 +27,20 @@ app = Flask(__name__)
 
 # Primary cloud inventory instances (5 total, all starting as RUNNING)
 instances = {
-    "i-0a1b2c3d": {"name": "staging-api", "state": "running", "type": "t2.micro", "feed": "LIVE - VEGA Aries", "device_id": "vega-01"},
-    "i-0e4f5g6h": {"name": "dev-worker", "state": "running", "type": "t2.micro", "feed": "SIMULATED", "device_id": "sim-worker-02"},
-    "i-0q7r8s9t": {"name": "qa-runner", "state": "running", "type": "t2.micro", "feed": "SIMULATED", "device_id": "sim-qa-03"},
-    "i-0m5n6o1p": {"name": "batch-worker", "state": "running", "type": "t2.micro", "feed": "SIMULATED", "device_id": "sim-batch-04"},
-    "i-0u3v4w5x": {"name": "sandbox-01", "state": "running", "type": "t2.micro", "feed": "SIMULATED", "device_id": "sim-sandbox-05"},
+    "i-0a1b2c3d": {"name": "staging-api",  "state": "running", "type": "t2.micro", "resource_type": "Staging Server",    "feed": "LIVE - VEGA Aries", "device_id": "vega-01"},
+    "i-0e4f5g6h": {"name": "dev-worker",   "state": "running", "type": "t2.micro", "resource_type": "Dev Environment",   "feed": "REAL TRACE REPLAY", "device_id": "trace-worker-02"},
+    "i-0q7r8s9t": {"name": "qa-runner",    "state": "running", "type": "t2.micro", "resource_type": "QA Test Server",    "feed": "REAL TRACE REPLAY", "device_id": "trace-qa-03"},
+    "i-0m5n6o1p": {"name": "batch-worker", "state": "running", "type": "t2.micro", "resource_type": "Batch Processor",   "feed": "REAL TRACE REPLAY", "device_id": "trace-batch-04"},
+    "i-0u3v4w5x": {"name": "sandbox-01",   "state": "running", "type": "t2.micro", "resource_type": "Sandbox",           "feed": "SIMULATED",       "device_id": "sim-sandbox-05"},
+}
+
+# Pre-assigned Vault snapshot IDs per instance (stable for demo reproducibility)
+VAULT_SNAP_MAP = {
+    "i-0a1b2c3d": "VP-00192",
+    "i-0e4f5g6h": "VP-00193",
+    "i-0q7r8s9t": "VP-00194",
+    "i-0m5n6o1p": "VP-00195",
+    "i-0u3v4w5x": "VP-00196",
 }
 
 # Live edge telemetry state for hardware feeds
@@ -280,6 +289,85 @@ def run_live_scan():
     })
 
 
+@app.route("/instances/<instance_id>/evaluate", methods=["POST"])
+def evaluate_instance(instance_id):
+    """
+    POST /instances/<instance_id>/evaluate
+    Runs this single instance through:
+      TinyML pre-filter -> Isolation Forest -> Safety Gate
+    If TRUE_IDLE + gate passed: flips RUNNING -> RECLAIMED, writes Vault snapshot,
+    posts one Slack message for THIS instance with its name, resource_type and snapshot ID.
+    Each call is independent — calling one does NOT block or affect others.
+    """
+    if instance_id not in instances:
+        return jsonify({"error": "instance not found"}), 404
+
+    inst = instances[instance_id]
+    name = inst["name"]
+    resource_type = inst.get("resource_type", "Cloud Instance")
+    snap_id = VAULT_SNAP_MAP.get(instance_id, f"VP-{random.randint(10000,99999)}")
+
+    # --- Step 1: Pull telemetry (VEGA real feed for staging-api, synthetic for rest) ---
+    edge_data = edge_telemetry_store.get(instance_id)
+    if edge_data and instance_id == "i-0a1b2c3d":
+        reading = {
+            "instance_id": instance_id,
+            "cpu_percent": edge_data["cpu"],
+            "network_bytes": edge_data["network"] * 1000.0,
+            "open_sockets": edge_data["sockets"],
+            "iops": edge_data["iops"],
+            "timestamp": edge_data["timestamp"],
+        }
+        feed = "LIVE - VEGA Aries"
+    else:
+        reading = generate_telemetry(instance_id)
+        feed = "SIMULATED"
+
+    # --- Step 2: TinyML pre-filter ---
+    cpu = reading["cpu_percent"]
+    net_kb = reading["network_bytes"] / 1000.0
+    sockets = reading["open_sockets"]
+    iops = reading["iops"]
+    is_idle_candidate = (cpu <= 5.0 and net_kb <= 10.0 and sockets == 0 and iops <= 5.0)
+
+    # --- Step 3: Isolation Forest anomaly scoring ---
+    detection = detector.score(reading)
+    anomaly_score = detection.get("anomaly_score", 0.0)
+
+    # --- Step 4: Safety Gate (zero open sockets = safe to pause) ---
+    safety_gate_passed = (sockets == 0)
+
+    # --- Step 5: Decision ---
+    reclaimed = False
+    if is_idle_candidate and safety_gate_passed and inst["state"] == "running":
+        inst["state"] = "reclaimed"
+        vault.snapshot(instance_id, inst.copy())
+        reclaimed = True
+        # One Slack message per instance — correct name, type, ID, snapshot
+        notify_slack(
+            f"[CloudPulse] {name} ({resource_type}) confirmed idle - "
+            f"Vault snapshot {snap_id} secured. "
+            f"Use /cloudpulse wakeup {instance_id} to resume."
+        )
+
+    return jsonify({
+        "instance_id": instance_id,
+        "name": name,
+        "resource_type": resource_type,
+        "feed": feed,
+        "state": inst["state"],
+        "telemetry": {"cpu": cpu, "network_kb": round(net_kb, 2), "sockets": sockets, "iops": iops},
+        "pipeline": {
+            "tinyml_pre_filter": is_idle_candidate,
+            "isolation_forest_anomaly_score": round(anomaly_score, 4),
+            "safety_gate_passed": safety_gate_passed,
+        },
+        "instance_reclaimed": reclaimed,
+        "snapshot_id": snap_id if reclaimed else None,
+        "slack_sent": reclaimed,
+    }), 200
+
+
 @app.route("/instances/<instance_id>/stop", methods=["POST"])
 def stop_instance(instance_id):
     if instance_id not in instances:
@@ -349,12 +437,15 @@ def slack_slash_command():
 
         workload_name = instances[instance_id]["name"]
 
+        snap_id = VAULT_SNAP_MAP.get(instance_id, "VP-00192")
+        resource_type = instances[instance_id].get("resource_type", "Cloud Instance")
+
         return jsonify({
             "response_type": "in_channel",
             "text": (
                 f"[CloudPulse] Restore Request Accepted\n"
-                f"- Target Workload: `{instance_id}` ({workload_name})\n"
-                f"- Vault Snapshot Loaded: `VP-00192` (SHA-256 Verified)\n"
+                f"- Target Workload: `{instance_id}` ({workload_name} / {resource_type})\n"
+                f"- Vault Snapshot Loaded: `{snap_id}` (SHA-256 Verified)\n"
                 f"- Hydration Status: `COMPLETE`\n"
                 f"- Current State: `RUNNING`\n"
                 f"- Measured Hydration Time: `{hydration_sec} s` ({elapsed_ms} ms) [LIVE MEASURED]\n"

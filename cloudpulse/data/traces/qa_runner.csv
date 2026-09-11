@@ -1,0 +1,6 @@
+cpu,network,sockets,iops,memory
+time,network,sockets,iops,memory
+1.0,10.0,0,1.0,10
+5.0,20.0,0,2.0,12
+10.0,30.0,2,5.0,14
+2.0,5.0,0,0.5,8

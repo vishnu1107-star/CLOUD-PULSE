@@ -80,22 +80,22 @@ export function LandingHero() {
             <span>▶ RUN CLOUDPULSE DEMO</span>
           </button>
 
-          {/* Secondary CTA: Calculate Savings */}
+          {/* Secondary CTA: Edge Hardware & Architecture */}
           <Link
-            href="/roi"
+            href="/architecture"
             className="inline-flex items-center space-x-2 px-5 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm hover:shadow transition-all transform hover:-translate-y-0.5"
           >
-            <DollarSign className="w-4 h-4" />
-            <span>Calculate Savings</span>
+            <Zap className="w-4 h-4" />
+            <span>Edge Hardware &amp; Architecture</span>
           </Link>
 
-          {/* Tertiary CTA: Start 30-Day Pilot */}
+          {/* Tertiary CTA: Detection Model Validation */}
           <Link
-            href="/pilot"
+            href="/ml-insights"
             className="inline-flex items-center space-x-2 px-5 py-3.5 rounded-xl bg-white hover:bg-gray-50 text-gray-800 font-semibold text-sm border border-gray-300 shadow-sm hover:shadow transition-all"
           >
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Start 30-Day Pilot</span>
+            <span>Detection Model Validation</span>
           </Link>
         </div>
 
