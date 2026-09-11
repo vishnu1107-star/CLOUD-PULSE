@@ -29,7 +29,17 @@ async def background_metric_evaluation_loop():
                 if policy.auto_stop_enabled:
                     for item in evaluations:
                         if item.get("is_idle") and not item.get("override_active"):
-                            await executor.stop_resource(item["resource_id"], is_automated=True)
+                            result = await executor.stop_resource(
+                                item["resource_id"],
+                                is_automated=True,
+                                metrics=item.get("metrics")
+            )
+
+            logger.info(
+                "Reclamation result for %s: %s",
+                item["resource_id"],
+                result
+            )
         except Exception as e:
             logger.error(f"Error in background evaluation loop: {e}")
 

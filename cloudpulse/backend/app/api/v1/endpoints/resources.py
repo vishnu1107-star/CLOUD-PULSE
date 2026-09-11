@@ -16,6 +16,7 @@ from app.engine.event_logger import event_logger
 from app.schemas.hook import WakeupRequest
 from app.models.override import Override
 from app.services.simulated_driver import SimulatedCloudDriver
+from app.services.vega_controller import vega_controller
 
 router = APIRouter()
 vault_mgr = VaultManager()
@@ -134,51 +135,210 @@ async def vault_resource_snapshot(resource_id: str, db: AsyncSession = Depends(g
     }
 
 @router.post("/{resource_id}/reclaim")
-async def reclaim_resource(resource_id: str, db: AsyncSession = Depends(get_db)):
+async def reclaim_resource(
+    resource_id: str,
+    db: AsyncSession = Depends(get_db)
+):
     """
     Executes autonomous reclamation pipeline:
+
     1. Safety check
-    2. Vault snapshot creation
-    3. Non-destructive pause
-    4. State updated to RECLAIMED
+    2. VEGA Aries V2 hardware safety approval
+    3. Vault snapshot creation
+    4. Non-destructive pause
+    5. State updated to RECLAIMED
     """
-    q = await db.execute(select(Resource).where(Resource.resource_id == resource_id))
+
+    # ---------------------------------------------------------
+    # FIND RESOURCE
+    # ---------------------------------------------------------
+
+    q = await db.execute(
+        select(Resource).where(
+            Resource.resource_id == resource_id
+        )
+    )
+
     r = q.scalars().first()
+
     if not r:
-        raise HTTPException(status_code=404, detail=f"Resource {resource_id} not found")
+        raise HTTPException(
+            status_code=404,
+            detail=f"Resource {resource_id} not found"
+        )
 
-    # Safety check
-    metrics = SimulatedCloudDriver.get_simulated_metrics(resource_id, r.environment)
+    # ---------------------------------------------------------
+    # 1. CLOUDPULSE SAFETY CHECK
+    # ---------------------------------------------------------
+
+    metrics = SimulatedCloudDriver.get_simulated_metrics(
+        resource_id,
+        r.environment
+    )
+
     evaluator = IdleEvaluator(db)
-    policy = await evaluator.get_or_create_default_policy()
-    eval_data = await evaluator.evaluate_resource(r, policy)
-    sg_eval = SafetyGate.evaluate(metrics=metrics, ml_prediction={"is_idle": eval_data.get("is_idle")})
 
-    if not sg_eval["passed"]:
-        event_logger.log_event("SAFETY_GATE", f"Reclaim BLOCKED for {resource_id}: {sg_eval['primary_reason']}", "WARNING", resource_id)
+    policy = await evaluator.get_or_create_default_policy()
+
+    eval_data = await evaluator.evaluate_resource(
+        r,
+        policy
+    )
+
+    sg_eval = SafetyGate.evaluate(
+        metrics=metrics,
+        ml_prediction={
+            "is_idle": eval_data.get("is_idle")
+        }
+    )
+
+    # ---------------------------------------------------------
+    # 2. VEGA ARIES V2 HARDWARE SAFETY INTERLOCK
+    # ---------------------------------------------------------
+
+    event_logger.log_event(
+        "VEGA",
+        f"Requesting hardware approval for {resource_id}",
+        "INFO",
+        resource_id
+    )
+
+    vega_result = vega_controller.evaluate_reclamation(
+        cpu=float(
+            metrics.get("cpu_utilization", 0.0)
+        ),
+        network=float(
+            metrics.get("network_kbps", 0.0)
+        ),
+        sockets=int(
+            metrics.get("active_connections", 0)
+        ),
+        iops=float(
+            metrics.get("disk_io_iops", 0.0)
+        ),
+        memory=float(
+            metrics.get("memory_pct", 18.0)
+        )
+    )
+
+    event_logger.log_event(
+        "VEGA",
+        (
+            f"VEGA {vega_result.get('status')} "
+            f"for {resource_id}: "
+            f"{vega_result.get('reason', '')}"
+        ),
+        "INFO"
+        if vega_result.get("approved")
+        else "WARNING",
+        resource_id
+    )
+
+    # ---------------------------------------------------------
+    # BLOCK IF VEGA REJECTS OR IS OFFLINE
+    # ---------------------------------------------------------
+
+    if not vega_result.get("approved", False):
+
         return {
             "status": "blocked",
-            "message": "Reclamation blocked by Safety Gate",
+            "message": (
+                "Reclamation blocked by VEGA Aries V2 "
+                "hardware safety interlock"
+            ),
+            "vega_status": vega_result.get("status"),
+            "vega_reason": vega_result.get("reason"),
             "safety_gate": sg_eval
         }
 
-    # Create Vault Snapshot first (Rule: Nothing reclaimed before state protected)
-    snap = vault_mgr.create_snapshot(resource_id, {
-        "resource_id": r.resource_id,
-        "resource_name": r.resource_name,
-        "provider": r.provider,
-        "environment": r.environment,
-        "previous_state": r.state
-    })
-    event_logger.log_event("VAULT", f"Pre-reclaim snapshot {snap['snapshot_id']} secured", "SUCCESS", resource_id)
+    # ---------------------------------------------------------
+    # 3. CLOUDPULSE SAFETY GATE
+    # ---------------------------------------------------------
 
-    # Reclaim resource
+    if not sg_eval["passed"]:
+
+        event_logger.log_event(
+            "SAFETY_GATE",
+            (
+                f"Reclaim BLOCKED for {resource_id}: "
+                f"{sg_eval['primary_reason']}"
+            ),
+            "WARNING",
+            resource_id
+        )
+
+        return {
+            "status": "blocked",
+            "message": (
+                "Reclamation blocked by Safety Gate"
+            ),
+            "safety_gate": sg_eval,
+            "vega_status": "APPROVED"
+        }
+
+    # ---------------------------------------------------------
+    # 4. CREATE VAULT SNAPSHOT
+    # ---------------------------------------------------------
+
+    snap = vault_mgr.create_snapshot(
+        resource_id,
+        {
+            "resource_id": r.resource_id,
+            "resource_name": r.resource_name,
+            "provider": r.provider,
+            "environment": r.environment,
+            "previous_state": r.state
+        }
+    )
+
+    event_logger.log_event(
+        "VAULT",
+        (
+            f"Pre-reclaim snapshot "
+            f"{snap['snapshot_id']} secured"
+        ),
+        "SUCCESS",
+        resource_id
+    )
+
+    # ---------------------------------------------------------
+    # 5. RECLAIM RESOURCE
+    # ---------------------------------------------------------
+
     r.state = "RECLAIMED"
+
     r.last_activity_timestamp = datetime.utcnow()
+
     await db.commit()
 
-    event_logger.log_event("RECLAIM", f"Resource {resource_id} safely reclaimed. Spend halted.", "SUCCESS", resource_id)
-    event_logger.log_event("SLACK", f"Alert: Anomaly detected on {resource_id} — resource automatically paused. Protected state: {snap['snapshot_id']}.", "INFO", resource_id)
+    # ---------------------------------------------------------
+    # 6. LOG RECLAMATION
+    # ---------------------------------------------------------
+
+    event_logger.log_event(
+        "RECLAIM",
+        (
+            f"Resource {resource_id} safely reclaimed. "
+            f"Spend halted."
+        ),
+        "SUCCESS",
+        resource_id
+    )
+
+    event_logger.log_event(
+        "SLACK",
+        (
+            f"Alert: Anomaly detected on {resource_id} "
+            f"— resource automatically paused. "
+            f"Protected state: {snap['snapshot_id']}."
+        ),
+        "INFO",
+        resource_id
+    )
+
+    # ---------------------------------------------------------
+    # 7. RESPONSE
+    # ---------------------------------------------------------
 
     return {
         "status": "success",
@@ -186,7 +346,8 @@ async def reclaim_resource(resource_id: str, db: AsyncSession = Depends(get_db))
         "previous_state": "RUNNING",
         "new_state": "RECLAIMED",
         "protected_state": snap["snapshot_id"],
-        "snapshot": snap
+        "snapshot": snap,
+        "vega_status": "APPROVED"
     }
 
 @router.post("/{resource_id}/restore")
@@ -274,8 +435,14 @@ async def evaluate_and_execute(db: AsyncSession = Depends(get_db)):
     if policy.auto_stop_enabled:
         for item in evaluations:
             if item.get("is_idle") and not item.get("override_active"):
-                action_res = await executor.stop_resource(item["resource_id"], is_automated=True)
-                actions_taken.append(action_res)
+
+                action_res = await executor.stop_resource(
+                item["resource_id"],
+                is_automated=True,
+                metrics=item.get("metrics")
+            )
+
+            actions_taken.append(action_res)
 
     return {
         "evaluated_count": len(evaluations),
