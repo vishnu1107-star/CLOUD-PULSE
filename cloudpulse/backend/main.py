@@ -28,32 +28,20 @@ async def background_metric_evaluation_loop():
 
                 evaluations = await evaluator.evaluate_all()
 
+                # Determine overall system status across evaluations for background telemetry
+                has_idle = any(item.get("is_idle") or str(item.get("state", "")).upper() in ["RECLAIMED", "PAUSED", "STOPPED"] for item in evaluations)
+                bg_validated_status = "IDLE" if has_idle else "RUNNING"
+                
+                # Drive VEGA physical LED via existing COM6 serial connection.
+                led_result = vega_controller.set_led_status(bg_validated_status)
+                logger.info(
+                    "[VEGA LED] background_loop validated_status=%s led=%s",
+                    bg_validated_status,
+                    led_result.get("led_info", led_result.get("status"))
+                )
+
                 for item in evaluations:
                     is_idle = item.get("is_idle", False)
-
-                    # ----------------------------------------------------------------
-                    # Determine validated state — same logic as resources.py endpoints
-                    # ----------------------------------------------------------------
-                    resource_state = str(item.get("state", "RUNNING")).upper()
-                    if resource_state in ["RECLAIMED", "PAUSED", "STOPPED"] or is_idle:
-                        validated_status = "IDLE"
-                    elif resource_state == "RUNNING" or not is_idle:
-                        validated_status = "RUNNING"
-                    else:
-                        validated_status = "OFF"
-
-                    # ----------------------------------------------------------------
-                    # Drive VEGA physical LED via existing COM6 serial connection.
-                    # This is the integration point: validated backend state → LED.
-                    # set_led_status() sends LED,0 (GREEN) or LED,1 (RED) or LED,-1 (OFF)
-                    # ----------------------------------------------------------------
-                    led_result = vega_controller.set_led_status(validated_status)
-                    logger.info(
-                        "[VEGA LED] resource=%s validated_status=%s led=%s",
-                        item.get("resource_id"),
-                        validated_status,
-                        led_result.get("led_info", led_result.get("status"))
-                    )
 
                     # ----------------------------------------------------------------
                     # Existing auto-stop logic — unchanged
@@ -107,6 +95,10 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+# Ensure resources router is explicitly included to expose analyze endpoint
+from app.api.v1.endpoints import resources as resources_endpoint
+app.include_router(resources_endpoint.router, prefix=f"{settings.API_V1_STR}/resources", tags=["Cloud Resources"])
 
 @app.get("/")
 async def root():

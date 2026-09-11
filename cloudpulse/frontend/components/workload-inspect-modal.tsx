@@ -34,7 +34,7 @@ export function WorkloadInspectModal({ workload, isOpen, onClose, onReclaim, onH
   useEffect(() => {
     if (isOpen && workload) {
       setIsAnalyzing(true)
-      const resId = workload.id || workload.name
+      const resId = workload.id
       CloudPulseAPI.analyzeResource(resId)
         .then((data) => {
           if (data && data.vega_led) {

@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
-import { WorkloadItem, initialWorkloads } from '@/lib/demo-store'
+import React, { useState, useEffect } from 'react'
+import { WorkloadItem } from '@/lib/demo-store'
+import { CloudPulseAPI } from '@/lib/api'
 import { ResourceTable } from '@/components/resource-table'
 import { SafeReclaimModal } from '@/components/safe-reclaim-modal'
 import { HydrationModal } from '@/components/hydration-modal'
@@ -10,11 +11,47 @@ import { Server, Filter, Sparkles, ShieldCheck, Zap } from 'lucide-react'
 import { useToast } from '@/components/toast'
 
 export default function ResourcesPage() {
-  const [workloads, setWorkloads] = useState<WorkloadItem[]>(initialWorkloads)
+  const [workloads, setWorkloads] = useState<WorkloadItem[]>([])
   const [inspectWorkload, setInspectWorkload] = useState<WorkloadItem | null>(null)
   const [reclaimWorkload, setReclaimWorkload] = useState<WorkloadItem | null>(null)
   const [hydrateWorkload, setHydrateWorkload] = useState<WorkloadItem | null>(null)
   const { showToast } = useToast()
+
+  // Load resources from backend on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const resources = await CloudPulseAPI.getResources()
+        const mapped = resources.map((r) => ({
+          id: r.resource_id,
+          name: r.resource_name,
+          resource_type: r.resource_type,
+          provider: r.provider,
+          region: r.region,
+          environment: r.environment,
+          isProduction: false,
+          cpu: r.metrics?.cpu_utilization ?? 0,
+          network_kbps: r.metrics?.network_kbps ?? 0,
+          active_connections: r.metrics?.active_connections ?? 0,
+          iops: 'Low',
+          idle_confidence: r.metrics?.is_idle ? 100 : 0,
+          current_cost_day: r.hourly_cost * 24,
+          potential_savings_day: 0,
+          hourly_cost: r.hourly_cost,
+          state: r.state,
+          last_activity: '',
+          recommended_action: '',
+          tags: r.tags,
+        }))
+        console.log('Loaded resources IDs:', mapped.map(m=>m.id));
+        setWorkloads(mapped)
+      } catch (e) {
+        console.error('Failed to load resources', e)
+      }
+    })()
+  }, [])
+
+  
 
   const handleConfirmReclaim = (w: WorkloadItem) => {
     setWorkloads(prev => prev.map(item => {

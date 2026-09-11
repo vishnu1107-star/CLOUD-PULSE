@@ -2,24 +2,26 @@ import serial
 import time
 
 PORT = "COM6"
-BAUD = 115200
+BAUDRATE = 115200
 
-print("Connecting to VEGA...")
-
-ser = serial.Serial(PORT, BAUD, timeout=2)
+vega = serial.Serial(PORT, BAUDRATE, timeout=2)
 
 time.sleep(2)
 
-print("Connected to VEGA on", PORT)
+print("VEGA connected")
 
-ser.write(b"PING\n")
+vega.write(b"RUNNING\n")
+print("Green command sent")
 
-time.sleep(1)
+time.sleep(3)
 
-while ser.in_waiting:
-    response = ser.readline().decode(errors="ignore").strip()
-    print("VEGA:", response)
+vega.write(b"IDLE\n")
+print("Red command sent")
 
-ser.close()
+time.sleep(3)
 
-print("Connection test completed.")
+vega.write(b"OFF\n")
+print("OFF command sent")
+
+vega.close()
+print("Connection closed")

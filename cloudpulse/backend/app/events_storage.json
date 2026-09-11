@@ -1,5 +1,253 @@
 [
   {
+    "id": "evt-0047",
+    "timestamp": "22:29:37",
+    "stage": "ANALYSIS",
+    "message": "Evaluated staging-api status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "staging-api"
+  },
+  {
+    "id": "evt-0046",
+    "timestamp": "22:29:30",
+    "stage": "ANALYSIS",
+    "message": "Evaluated test-db status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "test-db"
+  },
+  {
+    "id": "evt-0045",
+    "timestamp": "22:29:21",
+    "stage": "ANALYSIS",
+    "message": "Evaluated qa-api status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "qa-api"
+  },
+  {
+    "id": "evt-0044",
+    "timestamp": "22:27:23",
+    "stage": "ANALYSIS",
+    "message": "Evaluated qa-api status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "qa-api"
+  },
+  {
+    "id": "evt-0043",
+    "timestamp": "22:26:51",
+    "stage": "ANALYSIS",
+    "message": "Evaluated preview-app status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "preview-app"
+  },
+  {
+    "id": "evt-0042",
+    "timestamp": "22:26:32",
+    "stage": "ANALYSIS",
+    "message": "Evaluated qa-api status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "qa-api"
+  },
+  {
+    "id": "evt-0041",
+    "timestamp": "22:26:12",
+    "stage": "ANALYSIS",
+    "message": "Evaluated staging-api status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "staging-api"
+  },
+  {
+    "id": "evt-0040",
+    "timestamp": "22:23:21",
+    "stage": "ANALYSIS",
+    "message": "Evaluated build-runner status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "build-runner"
+  },
+  {
+    "id": "evt-0039",
+    "timestamp": "22:23:14",
+    "stage": "ANALYSIS",
+    "message": "Evaluated test-worker status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "test-worker"
+  },
+  {
+    "id": "evt-0038",
+    "timestamp": "22:23:08",
+    "stage": "ANALYSIS",
+    "message": "Evaluated qa-api status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "qa-api"
+  },
+  {
+    "id": "evt-0037",
+    "timestamp": "22:22:54",
+    "stage": "ANALYSIS",
+    "message": "Evaluated analytics-worker status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "analytics-worker"
+  },
+  {
+    "id": "evt-0036",
+    "timestamp": "22:22:44",
+    "stage": "ANALYSIS",
+    "message": "Evaluated build-runner status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "build-runner"
+  },
+  {
+    "id": "evt-0035",
+    "timestamp": "22:22:33",
+    "stage": "ANALYSIS",
+    "message": "Evaluated dev-cache status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "dev-cache"
+  },
+  {
+    "id": "evt-0034",
+    "timestamp": "22:22:21",
+    "stage": "ANALYSIS",
+    "message": "Evaluated qa-api status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "qa-api"
+  },
+  {
+    "id": "evt-0033",
+    "timestamp": "22:22:02",
+    "stage": "ANALYSIS",
+    "message": "Evaluated dev-cluster status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "dev-cluster"
+  },
+  {
+    "id": "evt-0032",
+    "timestamp": "22:21:53",
+    "stage": "ANALYSIS",
+    "message": "Evaluated staging-api status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "staging-api"
+  },
+  {
+    "id": "evt-0031",
+    "timestamp": "21:59:09",
+    "stage": "ANALYSIS",
+    "message": "Evaluated preview-app status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "preview-app"
+  },
+  {
+    "id": "evt-0030",
+    "timestamp": "21:58:56",
+    "stage": "ANALYSIS",
+    "message": "Evaluated test-db status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "test-db"
+  },
+  {
+    "id": "evt-0029",
+    "timestamp": "21:58:01",
+    "stage": "ANALYSIS",
+    "message": "Evaluated staging-api status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "staging-api"
+  },
+  {
+    "id": "evt-0028",
+    "timestamp": "21:53:37",
+    "stage": "ANALYSIS",
+    "message": "Evaluated qa-api status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "qa-api"
+  },
+  {
+    "id": "evt-0027",
+    "timestamp": "21:53:16",
+    "stage": "ANALYSIS",
+    "message": "Evaluated analytics-worker status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "analytics-worker"
+  },
+  {
+    "id": "evt-0026",
+    "timestamp": "21:53:06",
+    "stage": "ANALYSIS",
+    "message": "Evaluated dev-cluster status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "dev-cluster"
+  },
+  {
+    "id": "evt-0025",
+    "timestamp": "21:52:44",
+    "stage": "ANALYSIS",
+    "message": "Evaluated staging-api status=IDLE: Safety PASSED | VEGA LED=None",
+    "status": "INFO",
+    "resource_id": "staging-api"
+  },
+  {
+    "id": "evt-0024",
+    "timestamp": "21:03:40",
+    "stage": "ANALYSIS",
+    "message": "Evaluated test-db status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "test-db"
+  },
+  {
+    "id": "evt-0023",
+    "timestamp": "21:03:34",
+    "stage": "ANALYSIS",
+    "message": "Evaluated dev-cluster status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "dev-cluster"
+  },
+  {
+    "id": "evt-0022",
+    "timestamp": "21:03:24",
+    "stage": "ANALYSIS",
+    "message": "Evaluated staging-api status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "staging-api"
+  },
+  {
+    "id": "evt-0021",
+    "timestamp": "21:02:08",
+    "stage": "ANALYSIS",
+    "message": "Evaluated test-db status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "test-db"
+  },
+  {
+    "id": "evt-0020",
+    "timestamp": "21:02:03",
+    "stage": "ANALYSIS",
+    "message": "Evaluated dev-cluster status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "dev-cluster"
+  },
+  {
+    "id": "evt-0019",
+    "timestamp": "21:01:48",
+    "stage": "ANALYSIS",
+    "message": "Evaluated staging-api status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "staging-api"
+  },
+  {
+    "id": "evt-0018",
+    "timestamp": "20:44:10",
+    "stage": "ANALYSIS",
+    "message": "Evaluated staging-api status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "staging-api"
+  },
+  {
+    "id": "evt-0017",
+    "timestamp": "20:20:26",
+    "stage": "ANALYSIS",
+    "message": "Evaluated staging-api status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "staging-api"
+  },
+  {
     "id": "evt-0016",
     "timestamp": "18:51:19",
     "stage": "VEGA",

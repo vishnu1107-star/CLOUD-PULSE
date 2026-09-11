@@ -174,7 +174,7 @@ class VegaController:
         Mapping:
         - RUNNING / ACTIVE -> GREEN ON (GPIO 14 HIGH, GPIO 13 LOW)
         - FAST / IDLE / RECLAIMED / PAUSED / STOPPED -> RED ON (GPIO 14 LOW, GPIO 13 HIGH)
-        - Unknown / Error / Unavailable -> Both OFF (GPIO 14 & GPIO 13 LOW)
+        - OFF / Unknown / Error -> Both OFF (GPIO 14 & GPIO 13 LOW)
         """
         if not self.connect():
             return {
@@ -186,26 +186,31 @@ class VegaController:
         status_str = str(status).upper().strip()
 
         if status_str in ["RUNNING", "ACTIVE", "0", "GREEN"]:
-            cmd_val = "0"
+            cmd_name = "RUNNING"
+            gpio_log = "[VEGA LED] status=RUNNING GPIO14=HIGH GPIO13=LOW"
             led_info = "GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)"
         elif status_str in ["IDLE", "FAST", "IDLE CANDIDATE", "RECLAIMED", "PAUSED", "STOPPED", "1", "RED"]:
-            cmd_val = "1"
+            cmd_name = "FAST" if status_str == "FAST" else "IDLE"
+            gpio_log = f"[VEGA LED] status={cmd_name} GPIO14=LOW GPIO13=HIGH"
             led_info = "RED (GPIO 14 = LOW, GPIO 13 = HIGH)"
         else:
-            cmd_val = "-1"
+            cmd_name = "OFF"
+            gpio_log = "[VEGA LED] status=OFF GPIO14=LOW GPIO13=LOW"
             led_info = "OFF (Both GPIO 14 & 13 = LOW)"
 
-        command = f"LED,{cmd_val}\n"
+        command = f"{cmd_name}\n"
 
         try:
-            logger.info("Sending VEGA LED command: %s for status '%s'", command.strip(), status_str)
+            logger.info(gpio_log)
+            print(gpio_log)
             self.serial_connection.write(command.encode("utf-8"))
             self.serial_connection.flush()
             return {
                 "success": True,
-                "status": status_str,
-                "led_state": cmd_val,
-                "led_info": led_info
+                "status": cmd_name,
+                "led_state": cmd_name,
+                "led_info": led_info,
+                "gpio_log": gpio_log
             }
         except Exception as exc:
             logger.error("Failed to send LED command to VEGA: %s", exc)

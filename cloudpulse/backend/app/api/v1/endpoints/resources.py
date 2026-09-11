@@ -63,7 +63,7 @@ async def list_resources(environment: str = None, db: AsyncSession = Depends(get
         out_list.append(item)
     return out_list
 
-@router.get("/{resource_id}")
+@router.get("/{resource_id:path}")
 async def get_resource_detail(resource_id: str, db: AsyncSession = Depends(get_db)):
     """Get detailed telemetry, ML insight, and Vault status for a specific resource, transmitting status to VEGA LED."""
     q = await db.execute(select(Resource).where(Resource.resource_id == resource_id))
@@ -105,7 +105,7 @@ async def get_resource_detail(resource_id: str, db: AsyncSession = Depends(get_d
     }
 
 
-@router.post("/{resource_id}/analyze")
+@router.post("/{resource_id:path}/analyze")
 async def analyze_resource(resource_id: str, db: AsyncSession = Depends(get_db)):
     """Runs on-demand multi-signal analysis & safety gate inspection, forwarding real status to VEGA LED."""
     q = await db.execute(select(Resource).where(Resource.resource_id == resource_id))

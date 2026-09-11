@@ -35,7 +35,7 @@ interface ResourceTableProps {
 }
 
 export function ResourceTable({ 
-  workloads = initialWorkloads, 
+  workloads = [], 
   onInspect, 
   onSafeReclaim, 
   onHydrate,
