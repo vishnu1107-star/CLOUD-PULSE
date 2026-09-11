@@ -1,5 +1,53 @@
 [
   {
+    "id": "evt-0010",
+    "timestamp": "17:36:15",
+    "stage": "VEGA",
+    "message": "VEGA VEGA_OFFLINE for staging-api: VEGA Aries V2 is unavailable",
+    "status": "WARNING",
+    "resource_id": "staging-api"
+  },
+  {
+    "id": "evt-0009",
+    "timestamp": "17:36:15",
+    "stage": "VEGA",
+    "message": "Requesting hardware approval for staging-api",
+    "status": "INFO",
+    "resource_id": "staging-api"
+  },
+  {
+    "id": "evt-0008",
+    "timestamp": "17:36:15",
+    "stage": "SAFETY_GATE",
+    "message": "Safety gate BLOCKED vega-safety-test: Active socket detected (3 open connections). Resource protected.",
+    "status": "WARNING",
+    "resource_id": null
+  },
+  {
+    "id": "evt-0007",
+    "timestamp": "17:36:15",
+    "stage": "SLACK",
+    "message": "Alert: Anomaly detected on i-0e4f5g6h (staging-api) \u2014 resource automatically paused. Vault snapshot VP-00192 secured.",
+    "status": "INFO",
+    "resource_id": "i-0e4f5g6h"
+  },
+  {
+    "id": "evt-0006",
+    "timestamp": "17:36:15",
+    "stage": "SAFETY_GATE",
+    "message": "Safety gate PASSED for vega-idle-probe -> i-0e4f5g6h (CPU: 1.4%, Sockets: 0)",
+    "status": "SUCCESS",
+    "resource_id": null
+  },
+  {
+    "id": "evt-0005",
+    "timestamp": "17:36:15",
+    "stage": "SAFETY_GATE",
+    "message": "Safety gate BLOCKED vega-active-probe: Active socket detected (24 open connections). Resource protected.",
+    "status": "WARNING",
+    "resource_id": null
+  },
+  {
     "id": "evt-0004",
     "timestamp": "03:58:35",
     "stage": "DEMO",

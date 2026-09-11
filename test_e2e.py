@@ -1,12 +1,16 @@
 import os, time, json
 
-# Load .env
-with open('.env') as f:
-    for line in f:
-        line = line.strip()
-        if line and not line.startswith('#') and '=' in line:
-            k, v = line.split('=', 1)
-            os.environ[k.strip()] = v.strip()
+# Load .env if present
+env_paths = ['.env', 'cloudpulse/.env']
+for p in env_paths:
+    if os.path.exists(p):
+        with open(p) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    k, v = line.split('=', 1)
+                    os.environ[k.strip()] = v.strip()
+
 
 from app import app
 

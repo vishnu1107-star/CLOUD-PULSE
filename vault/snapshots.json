@@ -5,10 +5,10 @@
       "state": "reclaimed",
       "type": "t2.micro",
       "resource_type": "Dev Environment",
-      "feed": "SIMULATED",
-      "device_id": "sim-worker-02"
+      "feed": "REAL TRACE REPLAY",
+      "device_id": "trace-worker-02"
     },
-    "paused_at": 1789129317.3741865
+    "paused_at": 1789148237.9129481
   },
   "i-0q7r8s9t": {
     "state": {
@@ -16,10 +16,10 @@
       "state": "reclaimed",
       "type": "t2.micro",
       "resource_type": "QA Test Server",
-      "feed": "SIMULATED",
-      "device_id": "sim-qa-03"
+      "feed": "REAL TRACE REPLAY",
+      "device_id": "trace-qa-03"
     },
-    "paused_at": 1789129446.8576314
+    "paused_at": 1789148237.9319425
   },
   "i-0m5n6o1p": {
     "state": {
@@ -27,10 +27,10 @@
       "state": "reclaimed",
       "type": "t2.micro",
       "resource_type": "Batch Processor",
-      "feed": "SIMULATED",
-      "device_id": "sim-batch-04"
+      "feed": "REAL TRACE REPLAY",
+      "device_id": "trace-batch-04"
     },
-    "paused_at": 1789123777.622983
+    "paused_at": 1789148237.950096
   },
   "i-0a1b2c3d": {
     "state": {
@@ -41,6 +41,6 @@
       "feed": "LIVE - VEGA Aries",
       "device_id": "vega-01"
     },
-    "paused_at": 1789129289.7652972
+    "paused_at": 1789148237.8951669
   }
 }

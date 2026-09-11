@@ -24,10 +24,21 @@ from slack_bot import notify_slack
 from flask_socketio import SocketIO, emit
 import json
 import datetime
+import sys
+
+backend_dir = os.path.join(os.path.dirname(__file__), "backend")
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
+
+try:
+    from app.services.vega_controller import vega_controller
+except Exception:
+    vega_controller = None
 
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
+
 
 # Primary cloud inventory instances (5 total, all starting as RUNNING)
 instances = {
@@ -373,12 +384,22 @@ def evaluate_instance(instance_id):
             f"Use /cloudpulse wakeup {instance_id} to resume."
         )
 
+    real_status = "IDLE" if (is_idle_candidate or inst["state"] != "running") else "RUNNING"
+    vega_led_res = None
+    if vega_controller:
+        try:
+            vega_led_res = vega_controller.set_led_status(real_status)
+        except Exception as err:
+            vega_led_res = {"success": False, "error": str(err)}
+
     return jsonify({
         "instance_id": instance_id,
         "name": name,
         "resource_type": resource_type,
         "feed": feed,
         "state": inst["state"],
+        "real_status": real_status,
+        "vega_led": vega_led_res,
         "telemetry": {"cpu": cpu, "network_kb": round(net_kb, 2), "sockets": sockets, "iops": iops},
         "pipeline": {
             "tinyml_pre_filter": is_idle_candidate,
@@ -389,6 +410,7 @@ def evaluate_instance(instance_id):
         "snapshot_id": snap_id if reclaimed else None,
         "slack_sent": reclaimed,
     }), 200
+
 
 
 @app.route("/instances/<instance_id>/stop", methods=["POST"])

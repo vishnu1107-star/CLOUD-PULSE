@@ -65,10 +65,15 @@ async def list_resources(environment: str = None, db: AsyncSession = Depends(get
 
 @router.get("/{resource_id}")
 async def get_resource_detail(resource_id: str, db: AsyncSession = Depends(get_db)):
-    """Get detailed telemetry, ML insight, and Vault status for a specific resource."""
+    """Get detailed telemetry, ML insight, and Vault status for a specific resource, transmitting status to VEGA LED."""
     q = await db.execute(select(Resource).where(Resource.resource_id == resource_id))
     r = q.scalars().first()
     if not r:
+        q_name = await db.execute(select(Resource).where(Resource.resource_name.ilike(f"%{resource_id}%")))
+        r = q_name.scalars().first()
+
+    if not r:
+        vega_controller.set_led_status("OFF")
         raise HTTPException(status_code=404, detail=f"Resource {resource_id} not found")
     
     evaluator = IdleEvaluator(db)
@@ -76,22 +81,43 @@ async def get_resource_detail(resource_id: str, db: AsyncSession = Depends(get_d
     eval_data = await evaluator.evaluate_resource(r, policy)
     metrics = eval_data.get("metrics", {})
     sg_eval = SafetyGate.evaluate(metrics=metrics, ml_prediction={"is_idle": eval_data.get("is_idle")})
-    snap = vault_mgr.get_snapshot(resource_id)
+    snap = vault_mgr.get_snapshot(r.resource_id)
+
+    is_idle = eval_data.get("is_idle", False)
+    res_state = (r.state or "RUNNING").upper()
+
+    if res_state in ["RECLAIMED", "PAUSED", "STOPPED"] or is_idle:
+        real_status = "IDLE"
+    elif res_state == "RUNNING":
+        real_status = "RUNNING"
+    else:
+        real_status = "OFF"
+
+    vega_res = vega_controller.set_led_status(real_status)
 
     return {
         "resource": ResourceOut.model_validate(r),
         "evaluation": eval_data,
         "safety_gate": sg_eval,
-        "vault_snapshot": snap
+        "vault_snapshot": snap,
+        "real_status": real_status,
+        "vega_led": vega_res
     }
+
 
 @router.post("/{resource_id}/analyze")
 async def analyze_resource(resource_id: str, db: AsyncSession = Depends(get_db)):
-    """Runs on-demand multi-signal analysis & safety gate inspection."""
+    """Runs on-demand multi-signal analysis & safety gate inspection, forwarding real status to VEGA LED."""
     q = await db.execute(select(Resource).where(Resource.resource_id == resource_id))
     r = q.scalars().first()
     if not r:
-        raise HTTPException(status_code=404, detail=f"Resource {resource_id} not found")
+        # Fallback search by resource name or substring matching
+        q_name = await db.execute(select(Resource).where(Resource.resource_name.ilike(f"%{resource_id}%")))
+        r = q_name.scalars().first()
+
+    if not r:
+        vega_err = vega_controller.set_led_status("OFF")
+        raise HTTPException(status_code=404, detail=f"Resource '{resource_id}' not found")
 
     evaluator = IdleEvaluator(db)
     policy = await evaluator.get_or_create_default_policy()
@@ -99,13 +125,30 @@ async def analyze_resource(resource_id: str, db: AsyncSession = Depends(get_db))
     metrics = eval_data.get("metrics", {})
     sg_eval = SafetyGate.evaluate(metrics=metrics, ml_prediction={"is_idle": eval_data.get("is_idle")})
 
-    event_logger.log_event("ANALYSIS", f"Evaluated {resource_id}: Safety {sg_eval['status']} ({sg_eval['primary_reason']})", "INFO", resource_id)
+    is_idle = eval_data.get("is_idle", False)
+    res_state = (r.state or "RUNNING").upper()
+
+    if res_state in ["RECLAIMED", "PAUSED", "STOPPED"] or is_idle:
+        real_status = "IDLE"
+    elif res_state == "RUNNING":
+        real_status = "RUNNING"
+    else:
+        real_status = "OFF"
+
+    vega_result = vega_controller.set_led_status(real_status)
+
+    event_logger.log_event("ANALYSIS", f"Evaluated {resource_id} status={real_status}: Safety {sg_eval['status']} | VEGA LED={vega_result.get('led_info')}", "INFO", resource_id)
 
     return {
-        "resource_id": resource_id,
+        "resource_id": r.resource_id,
+        "resource_name": r.resource_name,
+        "state": r.state,
+        "real_status": real_status,
         "evaluation": eval_data,
-        "safety_gate": sg_eval
+        "safety_gate": sg_eval,
+        "vega_led": vega_result
     }
+
 
 @router.post("/{resource_id}/vault")
 async def vault_resource_snapshot(resource_id: str, db: AsyncSession = Depends(get_db)):

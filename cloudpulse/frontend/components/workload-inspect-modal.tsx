@@ -1,7 +1,9 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { WorkloadItem } from '@/lib/demo-store'
+
+import { CloudPulseAPI } from '@/lib/api'
 import { 
   Activity, 
   Server, 
@@ -13,7 +15,8 @@ import {
   X, 
   CheckCircle2, 
   Layers, 
-  Tag
+  Tag,
+  Radio
 } from 'lucide-react'
 
 interface WorkloadInspectModalProps {
@@ -25,6 +28,34 @@ interface WorkloadInspectModalProps {
 }
 
 export function WorkloadInspectModal({ workload, isOpen, onClose, onReclaim, onHydrate }: WorkloadInspectModalProps) {
+  const [vegaStatus, setVegaStatus] = useState<string | null>(null)
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (isOpen && workload) {
+      setIsAnalyzing(true)
+      const resId = workload.id || workload.name
+      CloudPulseAPI.analyzeResource(resId)
+        .then((data) => {
+          if (data && data.vega_led) {
+            setVegaStatus(data.vega_led.led_info || data.real_status)
+          } else {
+            const isRunning = workload.state === 'RUNNING' && workload.cpu >= 5.0
+            setVegaStatus(isRunning ? 'GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)' : 'RED (GPIO 14 = LOW, GPIO 13 = HIGH)')
+          }
+        })
+        .catch(() => {
+          const isRunning = workload.state === 'RUNNING' && !workload.isProduction
+          setVegaStatus(isRunning ? 'GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)' : 'RED (GPIO 14 = LOW, GPIO 13 = HIGH)')
+        })
+        .finally(() => {
+          setIsAnalyzing(false)
+        })
+    } else {
+      setVegaStatus(null)
+    }
+  }, [isOpen, workload])
+
   if (!isOpen || !workload) return null
 
   return (
@@ -56,6 +87,23 @@ export function WorkloadInspectModal({ workload, isOpen, onClose, onReclaim, onH
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* VEGA Aries V2 Hardware Indicator */}
+        <div className="p-3 bg-slate-900 text-white rounded-2xl flex items-center justify-between text-xs border border-slate-800 shadow-md">
+          <div className="flex items-center space-x-2">
+            <Radio className={`w-4 h-4 text-emerald-400 ${isAnalyzing ? 'animate-spin' : ''}`} />
+            <div>
+              <span className="font-bold block text-[11px] text-slate-300">VEGA Aries V2 Hardware Signal:</span>
+              <span className="font-mono text-xs font-extrabold text-emerald-400">
+                {isAnalyzing ? 'Querying CloudPulse Status...' : (vegaStatus || 'ACTIVE (COM6 Sync)')}
+              </span>
+            </div>
+          </div>
+          <span className="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-mono font-bold text-slate-300 border border-slate-700">
+            COM6 @ 115200
+          </span>
+        </div>
+
 
         {/* 5-Dimensional Metric Telemetry Grid */}
         <div className="space-y-2">

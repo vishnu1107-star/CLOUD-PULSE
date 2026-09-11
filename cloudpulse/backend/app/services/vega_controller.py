@@ -167,6 +167,56 @@ class VegaController:
                 "reason": str(exc)
             }
 
+    def set_led_status(self, status: str) -> Dict[str, Any]:
+        """
+        Send physical LED command to VEGA Aries V2 over the shared COM6 serial connection.
+        
+        Mapping:
+        - RUNNING / ACTIVE -> GREEN ON (GPIO 14 HIGH, GPIO 13 LOW)
+        - FAST / IDLE / RECLAIMED / PAUSED / STOPPED -> RED ON (GPIO 14 LOW, GPIO 13 HIGH)
+        - Unknown / Error / Unavailable -> Both OFF (GPIO 14 & GPIO 13 LOW)
+        """
+        if not self.connect():
+            return {
+                "success": False,
+                "status": "VEGA_OFFLINE",
+                "reason": "VEGA Aries V2 unavailable on " + str(self.port)
+            }
+
+        status_str = str(status).upper().strip()
+
+        if status_str in ["RUNNING", "ACTIVE", "0", "GREEN"]:
+            cmd_val = "0"
+            led_info = "GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)"
+        elif status_str in ["IDLE", "FAST", "IDLE CANDIDATE", "RECLAIMED", "PAUSED", "STOPPED", "1", "RED"]:
+            cmd_val = "1"
+            led_info = "RED (GPIO 14 = LOW, GPIO 13 = HIGH)"
+        else:
+            cmd_val = "-1"
+            led_info = "OFF (Both GPIO 14 & 13 = LOW)"
+
+        command = f"LED,{cmd_val}\n"
+
+        try:
+            logger.info("Sending VEGA LED command: %s for status '%s'", command.strip(), status_str)
+            self.serial_connection.write(command.encode("utf-8"))
+            self.serial_connection.flush()
+            return {
+                "success": True,
+                "status": status_str,
+                "led_state": cmd_val,
+                "led_info": led_info
+            }
+        except Exception as exc:
+            logger.error("Failed to send LED command to VEGA: %s", exc)
+            self.disconnect()
+            return {
+                "success": False,
+                "status": "VEGA_ERROR",
+                "reason": str(exc)
+            }
+
+
 
 # Shared physical VEGA controller
 vega_controller = VegaController(
