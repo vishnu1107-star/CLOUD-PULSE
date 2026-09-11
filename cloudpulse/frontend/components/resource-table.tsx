@@ -20,7 +20,8 @@ import {
   ShieldCheck,
   Search,
   Eye,
-  Tag
+  Tag,
+  Sparkles
 } from 'lucide-react'
 import { useToast } from '@/components/toast'
 
@@ -29,22 +30,26 @@ interface ResourceTableProps {
   onInspect?: (workload: WorkloadItem) => void
   onSafeReclaim?: (workload: WorkloadItem) => void
   onHydrate?: (workload: WorkloadItem) => void
+  onRunLiveScan?: () => void
+  isScanning?: boolean
 }
 
 export function ResourceTable({ 
   workloads = initialWorkloads, 
   onInspect, 
   onSafeReclaim, 
-  onHydrate 
+  onHydrate,
+  onRunLiveScan,
+  isScanning = false
 }: ResourceTableProps) {
   const [selectedCloud, setSelectedCloud] = useState<string>('ALL')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const { showToast } = useToast()
 
   const exportCsv = () => {
-    const headers = 'Workload Name,Cloud Provider,Region,Environment,Production,CPU (%),Network (MB/s),Active Connections,IOPS,Idle Confidence (%),Current Cost ($/day),Potential Savings ($/day),Status,Last Activity,Recommended Action\n'
+    const headers = 'Workload Name,Cloud Provider,Region,Environment,Production,CPU (%),Network (MB/s),Active Connections,IOPS,Idle Confidence (%),Current Cost ($/day),Potential Savings ($/day),Status,Vault Snapshot,Last Activity\n'
     const rows = workloads.map(w => 
-      `"${w.name}","${w.provider}","${w.region}","${w.environment}","${w.isProduction ? 'YES' : 'NO'}",${w.cpu},${w.network_kbps},${w.active_connections},"${w.iops}",${w.idle_confidence},${w.current_cost_day},${w.potential_savings_day},"${w.state}","${w.last_activity}","${w.recommended_action}"`
+      `"${w.name}","${w.provider}","${w.region}","${w.environment}","${w.isProduction ? 'YES' : 'NO'}",${w.cpu},${w.network_kbps},${w.active_connections},"${w.iops}",${w.idle_confidence},${w.current_cost_day},${w.potential_savings_day},"${w.state}","${w.snapshot_id || ''}","${w.last_activity}"`
     ).join('\n')
     const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement('a')
@@ -89,8 +94,8 @@ export function ResourceTable({
     }
   }
 
-  const getStateBadge = (state: string, isProduction: boolean) => {
-    if (isProduction) {
+  const getStateBadge = (w: WorkloadItem) => {
+    if (w.isProduction) {
       return (
         <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
           <Lock className="w-3 h-3 text-rose-600" />
@@ -98,7 +103,15 @@ export function ResourceTable({
         </span>
       )
     }
-    if (state === 'RUNNING') {
+    if (w.state === 'RUNNING') {
+      if (w.tag === 'ACTIVE - not touched' || w.id === 'i-0u3v4w5x') {
+        return (
+          <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-blue-100 text-blue-800 border border-blue-300 shadow-xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+            <span>ACTIVE - not touched</span>
+          </span>
+        )
+      }
       return (
         <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -107,9 +120,9 @@ export function ResourceTable({
       )
     }
     return (
-      <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-        <span>RECLAIMED / PAUSED</span>
+      <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
+        <span>RECLAIMED</span>
       </span>
     )
   }
@@ -123,20 +136,16 @@ export function ResourceTable({
         {/* Multi-Cloud Filter Tabs */}
         <div className="flex flex-wrap items-center gap-1.5 text-xs">
           {[
-            { id: 'ALL', label: 'All Clouds' },
+            { id: 'ALL', label: 'All Clouds (5 Instances)' },
             { id: 'AWS', label: 'AWS' },
             { id: 'GCP', label: 'GCP' },
             { id: 'K8S', label: 'Kubernetes' },
-            { id: 'AZURE', label: 'Azure (Coming next)', disabled: true }
           ].map((tab) => (
             <button
               key={tab.id}
-              disabled={tab.disabled}
               onClick={() => setSelectedCloud(tab.id)}
               className={`px-3 py-1.5 rounded-xl font-semibold transition-all ${
-                tab.disabled
-                  ? 'bg-gray-50 text-gray-400 border border-gray-100 cursor-not-allowed italic'
-                  : selectedCloud === tab.id
+                selectedCloud === tab.id
                   ? 'bg-blue-600 text-white shadow-sm'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
@@ -146,9 +155,20 @@ export function ResourceTable({
           ))}
         </div>
 
-        {/* Search & Export CSV */}
-        <div className="flex items-center space-x-2">
-          <div className="relative w-48 sm:w-56">
+        {/* Search, Run Live Scan, & Export CSV */}
+        <div className="flex flex-wrap items-center gap-2">
+          {onRunLiveScan && (
+            <button
+              onClick={onRunLiveScan}
+              disabled={isScanning}
+              className="flex items-center space-x-1.5 px-4 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold shadow-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Activity className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin' : ''}`} />
+              <span>{isScanning ? 'Scanning 5 Instances...' : 'Run Live Scan'}</span>
+            </button>
+          )}
+
+          <div className="relative w-40 sm:w-48">
             <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5" />
             <input
               type="text"
@@ -176,14 +196,14 @@ export function ResourceTable({
         <table className="w-full text-left text-xs text-gray-700">
           <thead className="bg-gray-50/80 font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200 text-[10px]">
             <tr>
-              <th className="py-3 px-4">Workload &amp; Cloud</th>
+              <th className="py-3 px-4">Workload &amp; Feed</th>
               <th className="py-3 px-4">Environment</th>
               <th className="py-3 px-4">Telemetry (CPU / Net / Sockets)</th>
               <th className="py-3 px-4">Idle Confidence</th>
               <th className="py-3 px-4">Current Spend</th>
               <th className="py-3 px-4">Reclaim Potential</th>
-              <th className="py-3 px-4">Status &amp; Last Activity</th>
-              <th className="py-3 px-4 text-right">Autonomous FinOps Actions</th>
+              <th className="py-3 px-4">Status &amp; Vault Snapshot</th>
+              <th className="py-3 px-4 text-right">Autonomous Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -236,13 +256,13 @@ export function ResourceTable({
                   <div className="space-y-0.5">
                     <div className="flex items-center space-x-1.5">
                       <span className="text-gray-400">CPU:</span>
-                      <span className={`font-mono font-bold ${w.cpu < 2.0 ? 'text-emerald-700' : 'text-gray-900'}`}>{w.cpu}%</span>
+                      <span className={`font-mono font-bold ${w.cpu < 5.0 ? 'text-emerald-700' : 'text-rose-700'}`}>{w.cpu}%</span>
                       <span className="text-gray-300">•</span>
                       <span className="text-gray-400">Net:</span>
                       <span className="font-mono text-gray-700">{w.network_kbps} MB/s</span>
                     </div>
                     <div className="flex items-center space-x-1 text-[10px] text-gray-500">
-                      <span>Sockets: <strong className="font-mono text-gray-700">{w.active_connections} TCP</strong></span>
+                      <span>Sockets: <strong className={`font-mono ${w.active_connections > 0 ? 'text-rose-600 font-bold' : 'text-emerald-700'}`}>{w.active_connections} TCP</strong></span>
                       <span>•</span>
                       <span>IOPS: <strong className="text-gray-700">{w.iops}</strong></span>
                     </div>
@@ -253,6 +273,8 @@ export function ResourceTable({
                 <td className="py-3.5 px-4">
                   {w.isProduction ? (
                     <span className="text-gray-400 text-[11px] italic">Active Production</span>
+                  ) : w.id === 'i-0u3v4w5x' || w.cpu > 50 ? (
+                    <span className="text-rose-600 font-mono font-bold text-xs">Active (0% Idle)</span>
                   ) : (
                     <div className="space-y-1">
                       <span className="font-mono font-bold text-emerald-700 text-xs">
@@ -276,30 +298,32 @@ export function ResourceTable({
 
                 {/* 6. Potential Savings */}
                 <td className="py-3.5 px-4 font-mono font-bold text-emerald-700">
-                  {w.potential_savings_day > 0 ? (
+                  {w.potential_savings_day > 0 && w.state !== 'RECLAIMED' ? (
                     <span>+${w.potential_savings_day.toFixed(2)}/day</span>
+                  ) : w.state === 'RECLAIMED' ? (
+                    <span className="text-emerald-600 font-bold">$14.70 Reclaimed</span>
                   ) : (
-                    <span className="text-gray-400 font-normal">$0.00 (Protected)</span>
+                    <span className="text-gray-400 font-normal">$0.00 (Active)</span>
                   )}
                 </td>
 
-                {/* 7. Status & Last Activity */}
+                {/* 7. Status & Vault Snapshot */}
                 <td className="py-3.5 px-4">
                   <div className="space-y-1">
-                    <div>{getStateBadge(w.state, w.isProduction)}</div>
+                    <div>{getStateBadge(w)}</div>
+                    {w.snapshot_id && (
+                      <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        <Lock className="w-3 h-3 text-indigo-600" />
+                        <span>Vault: {w.snapshot_id}</span>
+                      </div>
+                    )}
                     <span className="text-[10px] text-gray-400 block truncate max-w-[140px]" title={w.last_activity}>
                       {w.last_activity}
                     </span>
-                    {w.state === 'RUNNING' && (w.hydrationTimeMs || w.id === 'i-0a1b2c3d') && (
-                      <span className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                        <Clock className="w-2.5 h-2.5 text-blue-600" />
-                        <span>Hydration: {w.hydrationTimeMs || 2370} ms [LIVE MEASURED]</span>
-                      </span>
-                    )}
                   </div>
                 </td>
 
-                {/* 8. Action Buttons (Inspect, Snapshot, Reclaim, Hydrate) */}
+                {/* 8. Action Buttons */}
                 <td className="py-3.5 px-4 text-right">
                   <div className="flex items-center justify-end space-x-1.5">
                     
@@ -337,7 +361,7 @@ export function ResourceTable({
                     ) : (
                       <button
                         onClick={() => onHydrate && onHydrate(w)}
-                        className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all"
+                        className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all animate-bounce"
                       >
                         <Zap className="w-3.5 h-3.5 fill-current" />
                         <span>Hydrate</span>

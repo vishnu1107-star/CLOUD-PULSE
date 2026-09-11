@@ -1,22 +1,35 @@
 import random
 import time
 
-
-def _idle_or_spike(idle_range, spike_range, spike_chance=0.08):
-    if random.random() < spike_chance:
-        return round(random.uniform(*spike_range), 2)
-    return round(random.uniform(*idle_range), 2)
+# Configurable list of active instance IDs (shows real recent activity)
+# Default for demo: sandbox-01 ("i-0u3v4w5x") is active, others read as idle
+ACTIVE_INSTANCES_CONFIG = ["i-0u3v4w5x"]
 
 
 def generate_telemetry(instance_id):
-    return {
-        "instance_id": instance_id,
-        "cpu_percent": _idle_or_spike((0, 5), (60, 98)),
-        "network_bytes": _idle_or_spike((0, 2000), (500000, 5000000)),
-        "open_sockets": random.choice([0, 0, 0, 1, 2, 3, 3, 9, 14]),
-        "iops": _idle_or_spike((0, 10), (800, 4000)),
-        "timestamp": time.time(),
-    }
+    """
+    Generates synthetic telemetry based on ACTIVE_INSTANCES_CONFIG.
+    Active instances return high CPU/network/sockets/IOPS.
+    Idle instances return low telemetry passing pre-filter and safety gate.
+    """
+    if instance_id in ACTIVE_INSTANCES_CONFIG:
+        return {
+            "instance_id": instance_id,
+            "cpu_percent": round(random.uniform(65.0, 92.0), 2),
+            "network_bytes": round(random.uniform(45000.0, 150000.0), 2),
+            "open_sockets": random.randint(6, 24),
+            "iops": round(random.uniform(150.0, 450.0), 2),
+            "timestamp": time.time(),
+        }
+    else:
+        return {
+            "instance_id": instance_id,
+            "cpu_percent": round(random.uniform(0.5, 3.2), 2),
+            "network_bytes": round(random.uniform(500.0, 3500.0), 2),
+            "open_sockets": 0,
+            "iops": round(random.uniform(0.5, 3.0), 2),
+            "timestamp": time.time(),
+        }
 
 
 def generate_batch(instance_ids, n=1):

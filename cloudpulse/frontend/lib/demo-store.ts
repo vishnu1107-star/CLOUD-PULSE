@@ -17,8 +17,9 @@ export interface WorkloadItem {
   hourly_cost: number
   state: 'RUNNING' | 'PAUSED' | 'HYDRATING' | 'RECLAIMED'
   last_activity: string
-  recommended_action: 'Safe to reclaim' | 'Active workload' | 'Protected: Production' | 'Pre-warm scheduled'
+  recommended_action: string
   snapshot_id?: string
+  tag?: string
   tags: Record<string, string>
   isLiveHardware?: boolean
   lastReceivedTimestamp?: string
@@ -83,7 +84,7 @@ export interface FinOpsPolicyState {
   protected_tags: string[]
 }
 
-// Initial Mock Datasets
+// 5 Mock Cloud Workloads (all starting as RUNNING per VEGATHON specification)
 export const initialWorkloads: WorkloadItem[] = [
   {
     id: 'i-0a1b2c3d',
@@ -101,7 +102,7 @@ export const initialWorkloads: WorkloadItem[] = [
     potential_savings_day: 14.70,
     hourly_cost: 0.767,
     state: 'RUNNING',
-    last_activity: 'VEGA Aries RISC-V edge stream active',
+    last_activity: 'VEGA Aries RISC-V edge telemetry active',
     recommended_action: 'Safe to reclaim',
     isLiveHardware: true,
     lastReceivedTimestamp: '1 sec ago (115200 baud)',
@@ -109,14 +110,14 @@ export const initialWorkloads: WorkloadItem[] = [
     tags: { Environment: 'Staging', Team: 'Backend-Core', Hardware: 'VEGA-Aries-v2' }
   },
   {
-    id: 'w-2',
-    name: 'dev-frontend-react-02',
+    id: 'i-0e4f5g6h',
+    name: 'dev-worker',
     provider: 'AWS',
     region: 'us-west-2',
     environment: 'Dev',
     isProduction: false,
-    cpu: 0.4,
-    network_kbps: 0.2,
+    cpu: 0.8,
+    network_kbps: 0.5,
     active_connections: 0,
     iops: 'Low',
     idle_confidence: 99,
@@ -124,13 +125,13 @@ export const initialWorkloads: WorkloadItem[] = [
     potential_savings_day: 7.68,
     hourly_cost: 0.400,
     state: 'RUNNING',
-    last_activity: '18 hours ago (Off-hours)',
+    last_activity: '18 hours ago (Off-hours idle)',
     recommended_action: 'Safe to reclaim',
-    tags: { Environment: 'Dev', Team: 'Frontend', Project: 'Dashboard' }
+    tags: { Environment: 'Dev', Team: 'Frontend', Project: 'Worker' }
   },
   {
-    id: 'w-3',
-    name: 'qa-data-processor-pool',
+    id: 'i-0q7r8s9t',
+    name: 'qa-runner',
     provider: 'GCP',
     region: 'us-central1',
     environment: 'QA',
@@ -143,40 +144,19 @@ export const initialWorkloads: WorkloadItem[] = [
     current_cost_day: 24.80,
     potential_savings_day: 19.84,
     hourly_cost: 1.033,
-    state: 'PAUSED',
-    last_activity: '2 days ago',
-    recommended_action: 'Safe to reclaim',
-    snapshot_id: 'vault-snap-9281',
-    tags: { Environment: 'QA', Team: 'Data-Eng', Project: 'ETL-Pipelines' }
-  },
-  {
-    id: 'w-4',
-    name: 'prod-payments-gateway-cluster',
-    provider: 'AWS',
-    region: 'us-east-1',
-    environment: 'Production',
-    isProduction: true,
-    cpu: 48.2,
-    network_kbps: 184.0,
-    active_connections: 1420,
-    iops: 'High',
-    idle_confidence: 0,
-    current_cost_day: 94.20,
-    potential_savings_day: 0.00,
-    hourly_cost: 3.925,
     state: 'RUNNING',
-    last_activity: 'Active traffic (1.4k req/sec)',
-    recommended_action: 'Protected: Production',
-    tags: { Environment: 'Production', Tier: 'Critical', SLA: '99.99%' }
+    last_activity: '2 days ago (Zero job queue)',
+    recommended_action: 'Safe to reclaim',
+    tags: { Environment: 'QA', Team: 'Data-Eng', Project: 'QA-Runner' }
   },
   {
-    id: 'w-5',
-    name: 'k8s-qa-microservices-namespace',
+    id: 'i-0m5n6o1p',
+    name: 'batch-worker',
     provider: 'K8S',
     region: 'us-east-2',
-    environment: 'QA',
+    environment: 'Dev',
     isProduction: false,
-    cpu: 0.3,
+    cpu: 0.9,
     network_kbps: 0.8,
     active_connections: 0,
     iops: 'Low',
@@ -187,52 +167,53 @@ export const initialWorkloads: WorkloadItem[] = [
     state: 'RUNNING',
     last_activity: '11 hours ago (Zero pods active)',
     recommended_action: 'Safe to reclaim',
-    tags: { Environment: 'QA', Cluster: 'k8s-qa-east', Namespace: 'qa-services' }
+    tags: { Environment: 'Dev', Cluster: 'k8s-dev-east', Namespace: 'batch-processing' }
   },
   {
-    id: 'w-6',
-    name: 'dev-ai-training-worker',
-    provider: 'GCP',
-    region: 'europe-west1',
+    id: 'i-0u3v4w5x',
+    name: 'sandbox-01',
+    provider: 'AWS',
+    region: 'us-east-1',
     environment: 'Dev',
     isProduction: false,
-    cpu: 1.8,
-    network_kbps: 2.1,
-    active_connections: 0,
-    iops: 'Low',
-    idle_confidence: 94,
-    current_cost_day: 38.00,
-    potential_savings_day: 30.40,
-    hourly_cost: 1.583,
+    cpu: 78.4,
+    network_kbps: 85.0,
+    active_connections: 14,
+    iops: 'High',
+    idle_confidence: 0,
+    current_cost_day: 42.00,
+    potential_savings_day: 0.00,
+    hourly_cost: 1.750,
     state: 'RUNNING',
-    last_activity: '9 hours ago',
-    recommended_action: 'Safe to reclaim',
-    tags: { Environment: 'Dev', Team: 'AI-Research', GPU: 'None' }
+    last_activity: 'Active user traffic (14 TCP sockets active)',
+    recommended_action: 'Active workload',
+    tag: 'ACTIVE - not touched',
+    tags: { Environment: 'Dev', Tier: 'Sandbox', ActiveUser: 'dev-team' }
   }
 ]
 
 export const initialVaultSnapshots: VaultSnapshot[] = [
   {
     id: 'snap-1',
-    snapshot_id: 'vault-snap-9281',
-    workload_name: 'qa-data-processor-pool',
-    created_at: 'Today, 10:32 AM',
+    snapshot_id: 'VP-00192',
+    workload_name: 'staging-api',
+    created_at: 'Just now',
     retention_days: 30,
-    size_gb: 250,
-    region: 'us-central1',
+    size_gb: 45,
+    region: 'us-east-1',
     status: 'VAULTED',
     restore_time_benchmark: '2.34s benchmark',
     encryption: 'AES-256 Enabled',
-    provider: 'GCP'
+    provider: 'AWS'
   },
   {
     id: 'snap-2',
-    snapshot_id: 'vault-snap-8192',
-    workload_name: 'staging-api-server-legacy',
-    created_at: 'Yesterday, 04:15 PM',
-    retention_days: 29,
-    size_gb: 120,
-    region: 'us-east-1',
+    snapshot_id: 'VP-00193',
+    workload_name: 'dev-worker',
+    created_at: 'Just now',
+    retention_days: 30,
+    size_gb: 32,
+    region: 'us-west-2',
     status: 'VAULTED',
     restore_time_benchmark: '2.10s benchmark',
     encryption: 'AES-256 Enabled',
@@ -240,16 +221,16 @@ export const initialVaultSnapshots: VaultSnapshot[] = [
   },
   {
     id: 'snap-3',
-    snapshot_id: 'vault-snap-7741',
-    workload_name: 'dev-analytics-node-04',
-    created_at: '3 days ago',
-    retention_days: 27,
-    size_gb: 400,
-    region: 'us-west-2',
+    snapshot_id: 'VP-00194',
+    workload_name: 'qa-runner',
+    created_at: 'Just now',
+    retention_days: 30,
+    size_gb: 80,
+    region: 'us-central1',
     status: 'VAULTED',
     restore_time_benchmark: '2.65s benchmark',
     encryption: 'AES-256 Enabled',
-    provider: 'AWS'
+    provider: 'GCP'
   }
 ]
 
@@ -283,66 +264,6 @@ export const initialGhostAssets: GhostAsset[] = [
     recommended_action: 'Release IP',
     status: 'ORPHANED',
     detected_at: '28 days ago'
-  },
-  {
-    id: 'g-3',
-    name: 'idle-staging-alb-listener',
-    resource_id: 'alb-arn-staging-pub-0912',
-    type: 'IDLE_ALB',
-    provider: 'AWS',
-    region: 'us-west-2',
-    age_days: 35,
-    monthly_cost: 22.50,
-    size_gb: 0,
-    risk: 'Medium',
-    recommended_action: 'Review / Reclaim',
-    status: 'ORPHANED',
-    detected_at: '35 days ago'
-  },
-  {
-    id: 'g-4',
-    name: 'gcp-detached-ssd-persistent-disk',
-    resource_id: 'disk-gcp-qa-temp-storage',
-    type: 'UNUSED_DISK',
-    provider: 'GCP',
-    region: 'us-central1',
-    age_days: 52,
-    monthly_cost: 34.00,
-    size_gb: 340,
-    risk: 'Low',
-    recommended_action: 'Snapshot & Purge',
-    status: 'ORPHANED',
-    detected_at: '52 days ago'
-  },
-  {
-    id: 'g-5',
-    name: 'zombie-k8s-completed-jobs',
-    resource_id: 'k8s-job-etl-import-1049',
-    type: 'ZOMBIE_K8S_POD',
-    provider: 'K8S',
-    region: 'us-east-2',
-    age_days: 19,
-    monthly_cost: 14.20,
-    size_gb: 40,
-    risk: 'Low',
-    recommended_action: 'Drain Pods',
-    status: 'ORPHANED',
-    detected_at: '19 days ago'
-  },
-  {
-    id: 'g-6',
-    name: 'legacy-orphaned-snapshot-archive',
-    resource_id: 'snap-legacy-2025-archive-01',
-    type: 'ORPHANED_SNAPSHOT',
-    provider: 'AWS',
-    region: 'us-east-1',
-    age_days: 90,
-    monthly_cost: 18.00,
-    size_gb: 360,
-    risk: 'Low',
-    recommended_action: 'Snapshot & Purge',
-    status: 'ORPHANED',
-    detected_at: '90 days ago'
   }
 ]
 
@@ -352,60 +273,12 @@ export const initialAuditRecords: AuditRecord[] = [
     timestamp: '10:32:14 IST',
     user_or_system: 'CloudPulse AI',
     cloud: 'AWS',
-    resource: 'staging-api-03',
+    resource: 'staging-api',
     action: 'RECLAIM',
-    reason: '98% idle confidence (0 active connections, CPU 0.8%)',
+    reason: '98% idle confidence (0 active connections, CPU 1.4%)',
     savings: '$14.70/day',
-    snapshot: 'vault-snap-9281',
+    snapshot: 'VP-00192',
     result: 'Success ✓'
-  },
-  {
-    id: 'aud-002',
-    timestamp: '09:15:02 IST',
-    user_or_system: 'DevOps User',
-    cloud: 'AWS',
-    resource: 'dev-frontend-react-02',
-    action: 'HYDRATE',
-    reason: '1-Click developer warm re-activation request',
-    savings: '2.34s recovery',
-    snapshot: 'vault-snap-8192',
-    result: 'Success ✓'
-  },
-  {
-    id: 'aud-003',
-    timestamp: '08:45:00 IST',
-    user_or_system: 'System Scheduler',
-    cloud: 'AWS',
-    resource: 'staging-api-server-legacy',
-    action: 'SNAPSHOT',
-    reason: 'Pre-reclamation 30-day point-in-time state vaulting',
-    savings: 'Protected state',
-    snapshot: 'vault-snap-8192',
-    result: 'Success ✓'
-  },
-  {
-    id: 'aud-004',
-    timestamp: '08:00:19 IST',
-    user_or_system: 'CloudPulse AI',
-    cloud: 'GCP',
-    resource: 'disk-gcp-qa-temp-storage',
-    action: 'GHOST_PURGE',
-    reason: 'Unattached persistent disk idle for 52 days',
-    savings: '$34.00/mo',
-    snapshot: 'vault-snap-7741',
-    result: 'Success ✓'
-  },
-  {
-    id: 'aud-005',
-    timestamp: '07:30:11 IST',
-    user_or_system: 'FinOps Lead',
-    cloud: 'AWS',
-    resource: 'Production Cluster',
-    action: 'POLICY',
-    reason: 'Production environment locked by default — protected from automated power actions',
-    savings: 'Outage Protected',
-    snapshot: 'N/A',
-    result: 'Protected ✓'
   }
 ]
 
