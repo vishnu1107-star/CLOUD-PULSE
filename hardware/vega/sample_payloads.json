@@ -1,0 +1,39 @@
+{
+  "scenario_active": {
+    "device_id": "vega-01",
+    "timestamp": "2026-09-11T09:00:00Z",
+    "cpu": 65.2,
+    "network": 840.0,
+    "sockets": 24,
+    "iops": 72.0,
+    "memory": 74.0,
+    "process_activity": 8,
+    "expected_decision": "ACTIVE",
+    "expected_action": "KEEP RUNNING"
+  },
+  "scenario_true_idle": {
+    "device_id": "vega-01",
+    "timestamp": "2026-09-11T09:01:00Z",
+    "cpu": 1.4,
+    "network": 2.1,
+    "sockets": 0,
+    "iops": 1.0,
+    "memory": 18.0,
+    "process_activity": 0,
+    "expected_decision": "IDLE CANDIDATE",
+    "expected_action": "SAFE TO RECLAIM"
+  },
+  "scenario_false_idle": {
+    "device_id": "vega-01",
+    "timestamp": "2026-09-11T09:02:00Z",
+    "cpu": 2.0,
+    "network": 2.5,
+    "sockets": 3,
+    "iops": 2.0,
+    "memory": 35.0,
+    "process_activity": 1,
+    "expected_decision": "NOT SAFE",
+    "expected_action": "KEEP RUNNING",
+    "expected_block_reason": "Active socket detected (3 open connections). Resource protected."
+  }
+}

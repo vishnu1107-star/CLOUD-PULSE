@@ -1,0 +1,10 @@
+{
+  "i-0e4f5g6h": {
+    "state": {
+      "name": "dev-worker",
+      "state": "paused",
+      "type": "t2.micro"
+    },
+    "paused_at": 1788937001.269184
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "i-0a1b2c3d": {
+    "state": {
+      "name": "staging-api",
+      "state": "paused",
+      "type": "t2.micro"
+    },
+    "paused_at": 1788886427.0630958
+  }
+}

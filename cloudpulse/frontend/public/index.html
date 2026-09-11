@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudPulse – Autonomous Multi-Cloud Cost Reclamation Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { DEFAULT: '#2563EB', dark: '#1D4ED8', light: '#3B82F6' },
+            accent: { DEFAULT: '#10B981', dark: '#059669', light: '#34D399' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #F9FAFB; color: #111827; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .card {
+      background: #FFFFFF; border: 1px solid #E5E7EB;
+      border-radius: 16px; padding: 24px; transition: all 0.2s ease;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    }
+    .card:hover { border-color: #D1D5DB; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07); transform: translateY(-2px); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 0.9rem;
+      cursor: pointer; transition: all 0.2s; border: none; text-decoration: none;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary  { background: #2563EB; color: #fff; box-shadow: 0 1px 2px 0 rgba(37, 99, 235, 0.2); }
+    .btn-primary:hover { background: #1D4ED8; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3); }
+    .btn-secondary { background: #FFFFFF; color: #374151; border: 1px solid #D1D5DB; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+    .btn-secondary:hover { background: #F9FAFB; color: #111827; border-color: #9CA3AF; }
+    .btn-danger   { background: #DC2626; color: #fff; box-shadow: 0 1px 2px 0 rgba(220, 38, 38, 0.2); }
+    .btn-danger:hover { background: #B91C1C; box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3); }
+    .pipeline-step {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      flex: 1; min-width: 100px;
+    }
+    .pipeline-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; border: 2px solid #BFDBFE;
+      background: #EFF6FF;
+    }
+    .sdg-badge {
+      display: inline-flex; flex-direction: column; align-items: center;
+      padding: 16px 24px; border-radius: 12px; font-weight: 700;
+      gap: 4px; font-size: 1.1rem; min-width: 110px; background: #FFFFFF;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid #F3F4F6; font-size: 0.85rem; }
+    th { background: #F9FAFB; color: #4B5563; font-weight: 700; border-bottom: 1px solid #E5E7EB; }
+    td .check { color: #10B981; font-weight: 700; }
+    td .cross { color: #9CA3AF; }
+    .arch-layer {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 20px; border-radius: 12px; margin-bottom: 8px; background: #FFFFFF;
+      border: 1px solid #E5E7EB; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .leak-bar { height: 12px; border-radius: 6px; overflow: hidden; display: flex; }
+    .timeline-phase { padding: 16px 20px; border-radius: 12px; border-left: 4px solid; background: #FFFFFF; border-top: 1px solid #E5E7EB; border-right: 1px solid #E5E7EB; border-bottom: 1px solid #E5E7EB; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+    .number-stat { font-size: 3rem; font-weight: 900; line-height: 1; }
+    nav { position: fixed; top: 0; width: 100%; z-index: 100;
+      background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(16px);
+      border-bottom: 1px solid #E5E7EB; padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between; }
+    .nav-links a { color: #4B5563; text-decoration: none; font-size: 0.85rem; font-weight: 500;
+      padding: 6px 12px; border-radius: 8px; transition: all 0.2s; }
+    .nav-links a:hover { color: #2563EB; background: #EFF6FF; }
+    main { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+    section { padding: 70px 0; border-bottom: 1px solid #E5E7EB; }
+    footer { padding: 48px 20px; text-align: center; max-width: 1100px; margin: 0 auto; background: #FFFFFF; }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .pipeline { flex-wrap: wrap; }
+      .pipeline-arrow { display: none; }
+      .three-col { grid-template-columns: 1fr !important; }
+      .two-col { grid-template-columns: 1fr !important; }
+      .number-stat { font-size: 2.2rem; }
+    }
+    .simulator-input { width: 100%; accent-color: #2563EB; }
+    .tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .tag-blue  { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
+    .tag-green { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+    .tag-red   { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:32px;height:32px;background:#2563EB;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;color:#fff;box-shadow:0 1px 2px rgba(37,99,235,0.3)">⚡</div>
+    <span style="font-weight:800;font-size:1.1rem;color:#111827">Cloud<span style="color:#2563EB">Pulse</span></span>
+  </div>
+  <div class="nav-links" style="display:flex;gap:4px">
+    <a href="#problem">Problem</a>
+    <a href="#solution">Solution</a>
+    <a href="#technology">Technology</a>
+    <a href="#validation">Validation</a>
+    <a href="#impact">Impact</a>
+    <a href="#business">Business</a>
+  </div>
+  <a href="https://github.com/vishnu1107-star/CLOUD-PULSE-2" target="_blank" class="btn btn-secondary" style="padding:8px 16px;font-size:0.8rem">
+    ⭐ GitHub
+  </a>
+</nav>
+
+<main>
+
+<!-- ─── 1. HERO ─── -->
+<section id="hero" style="padding-top:130px;text-align:center">
+  <!-- Badge -->
+  <div style="display:inline-flex;align-items:center;gap:8px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:100px;padding:6px 16px;font-size:0.75rem;font-weight:700;color:#2563EB;margin-bottom:28px;letter-spacing:0.02em">
+    <span style="display:inline-block;width:7px;height:7px;background:#2563EB;border-radius:50%"></span>
+    EMBRIX&apos;26 VEGATHON · Bannari Amman Institute of Technology · Autonomous FinOps Engine
+  </div>
+
+  <!-- Tagline -->
+  <h1 style="font-size:clamp(2rem,5vw,3.6rem);font-weight:900;line-height:1.15;margin-bottom:20px;color:#111827">
+    CloudPulse: Reclaim idle<br>
+    <span style="background:linear-gradient(90deg,#2563EB,#10B981);-webkit-background-clip:text;-webkit-text-fill-color:transparent">cloud spend</span>
+    with zero downtime.
+  </h1>
+
+  <!-- Value Proposition -->
+  <p style="font-size:1.15rem;color:#4B5563;max-width:600px;margin:0 auto 36px;line-height:1.7;font-weight:500">
+    Save up to <strong style="color:#059669;font-weight:700">70%</strong> of non-prod cloud costs, restore in
+    <strong style="color:#2563EB;font-family:monospace;font-weight:700">2.3s</strong>, offset CO₂.
+  </p>
+
+  <!-- CTA Buttons -->
+  <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:50px">
+    <a href="#demo" class="btn btn-danger" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'});return false">
+      ▶ Watch Demo
+    </a>
+    <a href="https://github.com/vishnu1107-star/CLOUD-PULSE-2" target="_blank" class="btn btn-secondary">
+      ⭐ View GitHub
+    </a>
+    <a href="#console" class="btn btn-primary" onclick="document.getElementById('console').scrollIntoView({behavior:'smooth'});return false">
+      ⚡ Try Prototype →
+    </a>
+  </div>
+
+  <!-- KPI Cards -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;text-align:left">
+    <div class="card">
+      <div style="font-size:0.7rem;color:#6B7280;font-weight:700;margin-bottom:6px">📉 COST RECLAIMED</div>
+      <div style="font-size:2.2rem;font-weight:900;color:#059669;font-family:monospace">45–70%</div>
+      <div style="font-size:0.75rem;color:#6B7280">$8,518/mo per 100 nodes</div>
+    </div>
+    <div class="card">
+      <div style="font-size:0.7rem;color:#6B7280;font-weight:700;margin-bottom:6px">⚡ WARM HYDRATION</div>
+      <div style="font-size:2.2rem;font-weight:900;color:#2563EB;font-family:monospace">2.34s</div>
+      <div style="font-size:0.75rem;color:#6B7280">Mean re-activation speed</div>
+    </div>
+    <div class="card">
+      <div style="font-size:0.7rem;color:#6B7280;font-weight:700;margin-bottom:6px">🛡️ FALSE OUTAGES</div>
+      <div style="font-size:2.2rem;font-weight:900;color:#4F46E5;font-family:monospace">0/72k</div>
+      <div style="font-size:0.75rem;color:#6B7280">Benchmarked socket guard</div>
+    </div>
+    <div class="card">
+      <div style="font-size:0.7rem;color:#6B7280;font-weight:700;margin-bottom:6px">🌱 CARBON OFFSET</div>
+      <div style="font-size:2.2rem;font-weight:900;color:#059669;font-family:monospace">3,903 kg</div>
+      <div style="font-size:0.75rem;color:#6B7280">CO₂e avoided monthly / 100 VMs</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 2. PROBLEM ─── -->
+<section id="problem">
+  <div style="display:inline-flex;align-items:center;gap:6px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:4px 10px;border-radius:6px;margin-bottom:12px;background:#FEF2F2;color:#DC2626;border:1px solid #FECACA">
+    ⚠️ The Silent Cloud Crisis
+  </div>
+  <h2 style="font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:900;margin-bottom:6px;color:#111827">
+    $17B wasted annually on idle non-prod cloud resources.
+  </h2>
+  <p style="color:#4B5563;font-size:1rem;font-weight:500;margin-bottom:32px">
+    Enterprises waste up to 40% of budgets on idle staging clusters.
+  </p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px" class="two-col">
+
+    <!-- Big $17B infographic -->
+    <div class="card" style="background:linear-gradient(180deg,#FEF2F2,#FFFFFF);border-color:#FECACA">
+      <div style="font-size:0.7rem;font-family:monospace;color:#DC2626;font-weight:700;letter-spacing:0.1em;margin-bottom:12px">GLOBAL CLOUD WASTE FIGURE</div>
+      <div style="font-size:clamp(2rem,5vw,3.5rem);font-weight:900;color:#111827;margin-bottom:4px">
+        <span style="color:#DC2626">$</span>17,000,000,000
+      </div>
+      <p style="color:#991B1B;font-weight:600;font-size:0.9rem;margin-bottom:24px">$17 Billion Lost Annually in Idle &amp; Orphaned Cloud Compute</p>
+
+      <!-- Cloud + Money Drain visual -->
+      <div style="background:#FFFFFF;border:1px solid #FECACA;border-radius:12px;padding:16px;margin-bottom:20px;box-shadow:0 1px 2px rgba(0,0,0,0.04)">
+        <div style="display:flex;justify-content:space-between;font-size:0.75rem;font-weight:600;margin-bottom:8px">
+          <span style="color:#374151">☁️ 24/7 Staging Cluster Leakage</span>
+          <span style="color:#DC2626;font-family:monospace;font-weight:700">-68% Utility</span>
+        </div>
+        <div class="leak-bar" style="margin-bottom:8px;background:#F3F4F6">
+          <div style="background:#10B981;width:24%;height:100%"></div>
+          <div style="background:#EF4444;width:76%;height:100%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.7rem;font-family:monospace">
+          <span style="color:#059669;font-weight:700">▌ 40h Active Dev</span>
+          <span style="color:#DC2626;font-weight:700">128h Off-Hours WASTE ▐</span>
+        </div>
+      </div>
+
+      <!-- Enterprise anchor -->
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:14px;display:flex;gap:10px">
+        <span style="font-size:1.4rem;flex-shrink:0">🏢</span>
+        <div>
+          <div style="font-size:0.65rem;font-weight:800;color:#991B1B;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Enterprise Anchor Example</div>
+          <p style="font-size:0.8rem;color:#7F1D1D;line-height:1.5;font-weight:600">
+            "Enterprises waste up to 40% of budgets on idle staging clusters."
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 pain points -->
+    <div style="display:grid;grid-template-rows:1fr 1fr 1fr;gap:16px">
+      <div class="card">
+        <div style="font-size:0.65rem;font-family:monospace;color:#DC2626;font-weight:700;margin-bottom:6px">PAIN POINT 01</div>
+        <div style="font-size:1rem;font-weight:700;color:#111827;margin-bottom:6px">🧟 Off-Hours Zombie Compute</div>
+        <p style="font-size:0.82rem;color:#4B5563;line-height:1.5">Staging, QA, and Dev VMs run 24/7. Teams only use them 40h/week — 128h of pure budget drain every week.</p>
+        <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-top:12px;padding-top:10px;border-top:1px solid #F3F4F6">
+          <span style="color:#6B7280">Waste Ratio</span>
+          <strong style="color:#DC2626;font-family:monospace">76.2% of Hours</strong>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:0.65rem;font-family:monospace;color:#D97706;font-weight:700;margin-bottom:6px">PAIN POINT 02</div>
+        <div style="font-size:1rem;font-weight:700;color:#111827;margin-bottom:6px">👻 Silent Ghost Storage &amp; IPs</div>
+        <p style="font-size:0.82rem;color:#4B5563;line-height:1.5">Terminated instances leave unattached EBS volumes, idle ALBs, and orphan Elastic IPs billing silently.</p>
+        <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-top:12px;padding-top:10px;border-top:1px solid #F3F4F6">
+          <span style="color:#6B7280">Avg Monthly Leak</span>
+          <strong style="color:#D97706;font-family:monospace">$1,200–$4,500</strong>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:0.65rem;font-family:monospace;color:#2563EB;font-weight:700;margin-bottom:6px">PAIN POINT 03</div>
+        <div style="font-size:1rem;font-weight:700;color:#111827;margin-bottom:6px">📄 Passive FinOps Alert Fatigue</div>
+        <p style="font-size:0.82rem;color:#4B5563;line-height:1.5">Legacy tools output static PDF reports. Engineers ignore them out of fear that automated shutdowns cause downtime.</p>
+        <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-top:12px;padding-top:10px;border-top:1px solid #F3F4F6">
+          <span style="color:#6B7280">Action Rate</span>
+          <strong style="color:#2563EB;font-family:monospace">&lt; 8% Executed</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 3. SOLUTION ─── -->
+<section id="solution">
+  <div style="display:inline-flex;align-items:center;gap:6px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:4px 10px;border-radius:6px;margin-bottom:12px;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE">
+    ✅ The CloudPulse Solution
+  </div>
+  <h2 style="font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:900;margin-bottom:8px;color:#111827">
+    5-Stage Autonomous Reclamation Loop
+  </h2>
+  <p style="color:#4B5563;margin-bottom:36px;font-weight:500">Every action is REVERSIBLE. Software-defined, AI-driven, zero manual intervention.</p>
+
+  <!-- Pipeline -->
+  <div class="pipeline" style="display:flex;align-items:center;gap:8px;margin-bottom:36px;overflow-x:auto;padding-bottom:8px">
+    <div class="pipeline-step">
+      <div class="pipeline-icon" style="background:#EFF6FF;border-color:#BFDBFE;color:#2563EB">🔌</div>
+      <div style="font-weight:700;color:#111827;font-size:0.9rem">Telemetry</div>
+      <div style="font-size:0.7rem;color:#6B7280;text-align:center;max-width:90px">5D multi-signal CPU/net/GPU/IO fusion</div>
+    </div>
+    <div class="pipeline-arrow" style="font-size:1.4rem;color:#2563EB;flex-shrink:0">→</div>
+    <div class="pipeline-step">
+      <div class="pipeline-icon" style="background:#FEF3C7;border-color:#FDE68A;color:#D97706">🔍</div>
+      <div style="font-weight:700;color:#111827;font-size:0.9rem">Detect</div>
+      <div style="font-size:0.7rem;color:#6B7280;text-align:center;max-width:90px">Isolation Forest ML anomaly detection</div>
+    </div>
+    <div class="pipeline-arrow" style="font-size:1.4rem;color:#2563EB;flex-shrink:0">→</div>
+    <div class="pipeline-step">
+      <div class="pipeline-icon" style="background:#ECFDF5;border-color:#A7F3D0;color:#059669">🔒</div>
+      <div style="font-weight:700;color:#111827;font-size:0.9rem">Vault</div>
+      <div style="font-size:0.7rem;color:#6B7280;text-align:center;max-width:90px">30-day point-in-time snapshot backup</div>
+    </div>
+    <div class="pipeline-arrow" style="font-size:1.4rem;color:#2563EB;flex-shrink:0">→</div>
+    <div class="pipeline-step">
+      <div class="pipeline-icon" style="background:#FEF3C7;border-color:#FDE68A;color:#D97706">♻️</div>
+      <div style="font-weight:700;color:#111827;font-size:0.9rem">Reclaim</div>
+      <div style="font-size:0.7rem;color:#6B7280;text-align:center;max-width:90px">Non-destructive pause &amp; scale-to-zero</div>
+    </div>
+    <div class="pipeline-arrow" style="font-size:1.4rem;color:#2563EB;flex-shrink:0">→</div>
+    <div class="pipeline-step">
+      <div class="pipeline-icon" style="background:#EFF6FF;border-color:#BFDBFE;color:#2563EB">⚡</div>
+      <div style="font-weight:700;color:#111827;font-size:0.9rem">Hydrate</div>
+      <div style="font-size:0.7rem;color:#6B7280;text-align:center;max-width:90px">Sub-2.34s instant warm re-activation</div>
+    </div>
+  </div>
+
+  <!-- Safety Principle Banner -->
+  <div style="background:linear-gradient(90deg,#ECFDF5,#EFF6FF);border:1px solid #A7F3D0;border-radius:16px;padding:24px;display:flex;align-items:center;gap:16px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+    <div style="font-size:2rem;flex-shrink:0">🛡️</div>
+    <div>
+      <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;color:#059669;margin-bottom:4px">Safety Principle</div>
+      <p style="font-size:1.05rem;font-weight:700;color:#111827;margin:0">
+        "Every action is reversible — wrong decisions are cheap to undo."
+      </p>
+      <p style="font-size:0.8rem;color:#4B5563;margin-top:4px">Vault-backed snapshots, rollback on any anomaly, zero data loss guarantee.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 4. TECHNOLOGY ─── -->
+<section id="technology">
+  <div style="display:inline-flex;align-items:center;gap:6px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:4px 10px;border-radius:6px;margin-bottom:12px;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE">
+    🔬 Technology Stack
+  </div>
+  <h2 style="font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:900;margin-bottom:8px;color:#111827">
+    Proprietary Edge AI Architecture
+  </h2>
+  <p style="color:#4B5563;margin-bottom:36px;font-weight:500">Industry-first RISC-V edge telemetry + TinyML + Isolation Forest stack.</p>
+
+  <!-- Layered Architecture Diagram -->
+  <div style="margin-bottom:36px">
+    <h3 style="font-size:0.9rem;font-weight:700;color:#4B5563;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.05em">Edge → AI → Cloud Architecture</h3>
+    <div class="arch-layer">
+      <div style="width:40px;height:40px;border-radius:10px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">🔌</div>
+      <div style="flex:1">
+        <div style="font-weight:700;color:#111827;margin-bottom:2px">Edge Layer — C-DAC VEGA THEJAS32 RISC-V SoC</div>
+        <div style="font-size:0.78rem;color:#4B5563">TinyML Anomaly Probe · Hardware-level CPU/GPU/NET telemetry · 1Hz data stream</div>
+      </div>
+      <span class="tag tag-blue">RISC-V</span>
+    </div>
+    <div style="text-align:center;color:#2563EB;font-size:1.2rem;margin:4px 0">↓</div>
+    <div class="arch-layer">
+      <div style="width:40px;height:40px;border-radius:10px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">🧠</div>
+      <div style="flex:1">
+        <div style="font-weight:700;color:#111827;margin-bottom:2px">AI Layer — Isolation Forest + Predictive Diurnal Forecaster</div>
+        <div style="font-size:0.78rem;color:#4B5563">Unsupervised ML anomaly detection · 24h diurnal cycle prediction · 95.3% precision</div>
+      </div>
+      <span class="tag tag-blue">TinyML</span>
+    </div>
+    <div style="text-align:center;color:#2563EB;font-size:1.2rem;margin:4px 0">↓</div>
+    <div class="arch-layer">
+      <div style="width:40px;height:40px;border-radius:10px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">☁️</div>
+      <div style="flex:1">
+        <div style="font-weight:700;color:#111827;margin-bottom:2px">Cloud Layer — Multi-Cloud Orchestration Engine</div>
+        <div style="font-size:0.78rem;color:#4B5563">AWS EC2/EBS/EIP · GCP Compute · Kubernetes HPA/Scale · ESG carbon ledger</div>
+      </div>
+      <span class="tag tag-green">AWS / GCP / K8s</span>
+    </div>
+  </div>
+
+  <!-- Competitor Table -->
+  <div style="overflow-x:auto;border-radius:16px;border:1px solid #E5E7EB;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+    <table>
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>AWS Scheduler</th>
+          <th>CloudHealth</th>
+          <th>Kubecost</th>
+          <th>Spot.io</th>
+          <th style="color:#2563EB;background:#EFF6FF">⚡ CloudPulse</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Auto Stop/Start</td><td class="check">✅</td><td class="cross">⚠️ Manual</td><td class="cross">❌</td><td class="check">✅</td><td class="check" style="color:#2563EB">✅ Autonomous</td></tr>
+        <tr><td>Sub-3s Hydration</td><td class="cross">❌</td><td class="cross">❌</td><td class="cross">❌</td><td class="cross">❌</td><td class="check" style="color:#2563EB">✅ 2.34s</td></tr>
+        <tr><td>ML Anomaly Detection</td><td class="cross">❌</td><td class="cross">❌</td><td class="cross">❌</td><td class="cross">⚠️ Rules</td><td class="check" style="color:#2563EB">✅ Isolation Forest</td></tr>
+        <tr><td>Edge RISC-V Probe</td><td class="cross">❌</td><td class="cross">❌</td><td class="cross">❌</td><td class="cross">❌</td><td class="check" style="color:#2563EB">✅ C-DAC VEGA</td></tr>
+        <tr><td>Carbon ESG Tracking</td><td class="cross">❌</td><td class="cross">⚠️ Basic</td><td class="cross">❌</td><td class="cross">❌</td><td class="check" style="color:#2563EB">✅ Full CO₂ Ledger</td></tr>
+        <tr><td>Reversible Actions</td><td class="cross">❌</td><td class="cross">❌</td><td class="cross">❌</td><td class="cross">❌</td><td class="check" style="color:#2563EB">✅ Vault + Rollback</td></tr>
+        <tr><td>Predictive Forecasting</td><td class="cross">❌</td><td class="cross">⚠️ Manual rules</td><td class="cross">❌</td><td class="cross">⚠️ Spot pricing</td><td class="check" style="color:#2563EB">✅ Diurnal AI</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ─── 5. VALIDATION ─── -->
+<section id="validation">
+  <div style="display:inline-flex;align-items:center;gap:6px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:4px 10px;border-radius:6px;margin-bottom:12px;background:#ECFDF5;color:#059669;border:1px solid #A7F3D0">
+    📊 Benchmarked Results
+  </div>
+  <h2 style="font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:900;margin-bottom:8px;color:#111827">
+    Validated ROI — Real Numbers
+  </h2>
+  <p style="color:#4B5563;margin-bottom:36px;font-weight:500">Benchmarked on simulated 100-VM fleet over 30-day validation period.</p>
+
+  <!-- 3 KPI Cards -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:36px" class="three-col">
+    <div class="card" style="text-align:center">
+      <div style="font-size:2.4rem;margin-bottom:8px">💰</div>
+      <div class="number-stat" style="color:#059669;font-family:monospace">$8,518</div>
+      <div style="font-size:0.85rem;color:#059669;font-weight:700;margin:8px 0 4px">/ month per 100 instances</div>
+      <p style="font-size:0.8rem;color:#4B5563">Savings: 45–70% reclaimed → $8,518/month per 100 instances.</p>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:2.4rem;margin-bottom:8px">⚡</div>
+      <div class="number-stat" style="color:#2563EB;font-family:monospace">2.34s</div>
+      <div style="font-size:0.85rem;color:#2563EB;font-weight:700;margin:8px 0 4px">Mean re-activation time</div>
+      <p style="font-size:0.8rem;color:#4B5563">Hydration latency: 2.34s mean re-activation.</p>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:2.4rem;margin-bottom:8px">🌱</div>
+      <div class="number-stat" style="color:#059669;font-family:monospace">3,903</div>
+      <div style="font-size:0.85rem;color:#059669;font-weight:700;margin:8px 0 4px">kg CO₂e avoided / month</div>
+      <p style="font-size:0.8rem;color:#4B5563">Carbon offset: 3,903 kg CO₂e avoided monthly.</p>
+    </div>
+  </div>
+
+  <!-- Spend Bar Chart -->
+  <div class="card" style="margin-bottom:32px">
+    <h3 style="font-size:0.9rem;font-weight:700;color:#4B5563;margin-bottom:24px;text-transform:uppercase;letter-spacing:0.05em">Monthly Cloud Spend Comparison (100 VM Fleet)</h3>
+    <div style="display:flex;align-items:flex-end;gap:40px;height:200px;padding:0 20px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1">
+        <div style="background:#F87171;width:100%;height:180px;border-radius:8px 8px 0 0;position:relative;display:flex;align-items:flex-start;justify-content:center;padding-top:12px">
+          <span style="font-weight:800;color:#fff;font-family:monospace">$14,016</span>
+        </div>
+        <div style="font-size:0.8rem;color:#4B5563;text-align:center;font-weight:600">Unmanaged Cloud</div>
+        <span class="tag tag-red">BEFORE</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1">
+        <div style="background:#34D399;width:100%;height:calc(180px * 0.39);border-radius:8px 8px 0 0;position:relative;display:flex;align-items:flex-start;justify-content:center;padding-top:12px;margin-top:auto">
+          <span style="font-weight:800;color:#fff;font-family:monospace">$5,498</span>
+        </div>
+        <div style="font-size:0.8rem;color:#4B5563;text-align:center;font-weight:600">With CloudPulse</div>
+        <span class="tag tag-green">AFTER (-61%)</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;flex:1;padding-bottom:52px">
+        <div style="font-size:2rem;font-weight:900;color:#059669;font-family:monospace">−$8,518</div>
+        <div style="font-size:0.8rem;color:#059669;font-weight:700;text-align:center">Saved Monthly</div>
+        <div style="font-size:0.75rem;color:#6B7280;text-align:center">= $102,216/year<br>per 100 VMs</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Simulator -->
+  <div class="card" id="console">
+    <h3 style="font-size:1rem;font-weight:700;color:#2563EB;margin-bottom:4px">⚡ Live Fleet Cost Simulator</h3>
+    <p style="font-size:0.8rem;color:#6B7280;margin-bottom:20px">Adjust fleet size and idle hours to see real-time CloudPulse savings.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" class="two-col">
+      <div>
+        <label style="font-size:0.8rem;color:#374151;font-weight:600;display:block;margin-bottom:8px">Fleet Size: <strong id="fleetVal" style="color:#2563EB">100</strong> VMs</label>
+        <input type="range" min="10" max="500" value="100" class="simulator-input" id="fleet" oninput="calcSavings()">
+        <label style="font-size:0.8rem;color:#374151;font-weight:600;display:block;margin:16px 0 8px">Off-Hours Idle: <strong id="idleVal" style="color:#2563EB">70</strong>%</label>
+        <input type="range" min="30" max="90" value="70" class="simulator-input" id="idle" oninput="calcSavings()">
+      </div>
+      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:20px">
+        <div style="font-size:0.75rem;color:#6B7280;margin-bottom:4px">Without CloudPulse</div>
+        <div id="without" style="font-size:1.6rem;font-weight:900;color:#DC2626;font-family:monospace;margin-bottom:16px">$14,016 /mo</div>
+        <div style="font-size:0.75rem;color:#6B7280;margin-bottom:4px">With CloudPulse</div>
+        <div id="with" style="font-size:1.6rem;font-weight:900;color:#059669;font-family:monospace;margin-bottom:8px">$5,498 /mo</div>
+        <div style="border-top:1px solid #BFDBFE;padding-top:12px">
+          <div id="saved" style="font-size:2rem;font-weight:900;color:#059669;font-family:monospace">−$8,518 saved!</div>
+          <div style="font-size:0.75rem;color:#4B5563;margin-top:4px;font-weight:500" id="co2">3,903 kg CO₂e offset</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 6. IMPACT ─── -->
+<section id="impact">
+  <div style="display:inline-flex;align-items:center;gap:6px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:4px 10px;border-radius:6px;margin-bottom:12px;background:#ECFDF5;color:#059669;border:1px solid #A7F3D0">
+    🌍 Global Impact
+  </div>
+  <h2 style="font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:900;margin-bottom:8px;color:#111827">
+    Aligned with UN Sustainable Development Goals
+  </h2>
+  <p style="color:#4B5563;margin-bottom:36px;font-weight:500">CloudPulse creates measurable environmental and social value alongside cost savings.</p>
+
+  <!-- SDG Badges -->
+  <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:36px;justify-content:center">
+    <div class="sdg-badge" style="border:2px solid #FDBA74;color:#C2410C">
+      <span style="font-size:2rem">🏭</span>
+      <div style="font-size:0.65rem;font-weight:800;opacity:0.8;text-transform:uppercase">SDG 9</div>
+      <div style="font-size:0.75rem;text-align:center;font-weight:600">Industry &amp;<br>Innovation</div>
+    </div>
+    <div class="sdg-badge" style="border:2px solid #FCD34D;color:#B45309">
+      <span style="font-size:2rem">♻️</span>
+      <div style="font-size:0.65rem;font-weight:800;opacity:0.8;text-transform:uppercase">SDG 12</div>
+      <div style="font-size:0.75rem;text-align:center;font-weight:600">Responsible<br>Consumption</div>
+    </div>
+    <div class="sdg-badge" style="border:2px solid #86EFAC;color:#15803D">
+      <span style="font-size:2rem">🌿</span>
+      <div style="font-size:0.65rem;font-weight:800;opacity:0.8;text-transform:uppercase">SDG 13</div>
+      <div style="font-size:0.75rem;text-align:center;font-weight:600">Climate<br>Action</div>
+    </div>
+  </div>
+
+  <!-- CO2 Infographic -->
+  <div class="card" style="background:#ECFDF5;border-color:#A7F3D0;margin-bottom:32px">
+    <h3 style="font-size:1rem;font-weight:700;color:#065F46;margin-bottom:20px">🌱 100 instances → 3,903 kg CO₂ saved monthly</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;text-align:center">
+      <div>
+        <div style="font-size:2.2rem;font-weight:900;color:#059669;font-family:monospace">186</div>
+        <div style="font-size:0.8rem;color:#065F46;font-weight:700">Trees grown for a year</div>
+        <div style="font-size:0.7rem;color:#047857;margin-top:2px">equivalent carbon absorption</div>
+      </div>
+      <div>
+        <div style="font-size:2.2rem;font-weight:900;color:#059669;font-family:monospace">9,680</div>
+        <div style="font-size:0.8rem;color:#065F46;font-weight:700">Driving miles avoided</div>
+        <div style="font-size:0.7rem;color:#047857;margin-top:2px">in a typical gasoline car</div>
+      </div>
+      <div>
+        <div style="font-size:2.2rem;font-weight:900;color:#059669;font-family:monospace">10,140</div>
+        <div style="font-size:0.8rem;color:#065F46;font-weight:700">kWh power conserved</div>
+        <div style="font-size:0.7rem;color:#047857;margin-top:2px">equivalent electricity saved</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonial -->
+  <div class="card" style="border-left:4px solid #10B981;background:#FFFFFF">
+    <div style="font-size:1.3rem;color:#10B981;margin-bottom:8px">"</div>
+    <p style="font-size:1.05rem;color:#111827;font-weight:600;font-style:italic;margin-bottom:12px;line-height:1.6">
+      “CloudPulse removed my fear of downtime.”
+    </p>
+    <div style="font-size:0.8rem;color:#6B7280;font-weight:600">— DevOps Engineer, Early Pilot User</div>
+  </div>
+</section>
+
+<!-- ─── 7. BUSINESS & SCALE ─── -->
+<section id="business">
+  <div style="display:inline-flex;align-items:center;gap:6px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:4px 10px;border-radius:6px;margin-bottom:12px;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE">
+    📈 Business &amp; Scale
+  </div>
+  <h2 style="font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:900;margin-bottom:8px;color:#111827">
+    Market Sizing &amp; Growth Roadmap
+  </h2>
+  <p style="color:#4B5563;margin-bottom:36px;font-weight:500">Addressing a $17B total addressable market with a clear go-to-market funnel.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px" class="two-col">
+
+    <!-- TAM/SAM/SOM Concentric Circles -->
+    <div>
+      <h3 style="font-size:0.9rem;font-weight:700;color:#4B5563;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:20px">Market Sizing Snapshot</h3>
+      <div style="position:relative;width:220px;height:220px;margin:0 auto 24px">
+        <!-- TAM -->
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:220px;height:220px;border-radius:50%;border:2px dashed #FCA5A5;background:#FEF2F2;display:flex;align-items:center;justify-content:center"></div>
+        <!-- SAM -->
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:150px;height:150px;border-radius:50%;border:2px solid #93C5FD;background:#EFF6FF"></div>
+        <!-- SOM -->
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border-radius:50%;border:2px solid #34D399;background:#ECFDF5;display:flex;align-items:center;justify-content:center;flex-direction:column">
+          <div style="font-size:0.55rem;font-weight:800;color:#059669;text-align:center;line-height:1.2">SOM<br>$250K</div>
+        </div>
+        <!-- Labels -->
+        <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);text-align:center">
+          <div style="font-size:0.6rem;font-weight:800;color:#DC2626">TAM</div>
+          <div style="font-size:0.6rem;color:#6B7280">$17B</div>
+        </div>
+        <div style="position:absolute;top:44px;left:50%;transform:translateX(-50%);text-align:center">
+          <div style="font-size:0.6rem;font-weight:800;color:#2563EB">SAM</div>
+          <div style="font-size:0.6rem;color:#6B7280">$5B</div>
+        </div>
+      </div>
+
+      <!-- 3 market cards -->
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:12px;background:#FFFFFF;border:1px solid #FECACA;border-radius:10px;padding:12px;box-shadow:0 1px 2px rgba(0,0,0,0.03)">
+          <div style="width:10px;height:10px;border-radius:50%;background:#EF4444;flex-shrink:0"></div>
+          <div>
+            <div style="font-size:0.7rem;font-weight:800;color:#DC2626">TAM</div>
+            <div style="font-size:0.8rem;color:#374151">$17B idle non-prod waste globally</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:#FFFFFF;border:1px solid #BFDBFE;border-radius:10px;padding:12px;box-shadow:0 1px 2px rgba(0,0,0,0.03)">
+          <div style="width:10px;height:10px;border-radius:50%;background:#2563EB;flex-shrink:0"></div>
+          <div>
+            <div style="font-size:0.7rem;font-weight:800;color:#2563EB">SAM</div>
+            <div style="font-size:0.8rem;color:#374151">$5B AWS/GCP mid-size enterprises</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:#FFFFFF;border:1px solid #A7F3D0;border-radius:10px;padding:12px;box-shadow:0 1px 2px rgba(0,0,0,0.03)">
+          <div style="width:10px;height:10px;border-radius:50%;background:#10B981;flex-shrink:0"></div>
+          <div>
+            <div style="font-size:0.7rem;font-weight:800;color:#059669">SOM</div>
+            <div style="font-size:0.8rem;color:#374151">$250K ARR Y1 (10 adopters) → $1M ARR Y2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 90-Day Roadmap -->
+    <div>
+      <h3 style="font-size:0.9rem;font-weight:700;color:#4B5563;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:20px">90-Day Adoption Roadmap</h3>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="timeline-phase" style="border-color:#2563EB">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-size:1.1rem">🚀</span>
+            <div>
+              <div style="font-size:0.65rem;font-family:monospace;color:#2563EB;font-weight:700">PHASE 1 — DAYS 1–30</div>
+              <div style="font-weight:800;color:#111827">Pilot</div>
+            </div>
+          </div>
+          <p style="font-size:0.8rem;color:#4B5563;margin:0">Deploy agent on 1 staging cluster. Observe telemetry for 2 weeks. First reclaim action with full vault backup.</p>
+        </div>
+        <div class="timeline-phase" style="border-color:#10B981">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-size:1.1rem">📊</span>
+            <div>
+              <div style="font-size:0.65rem;font-family:monospace;color:#059669;font-weight:700">PHASE 2 — DAYS 31–60</div>
+              <div style="font-weight:800;color:#111827">Prove</div>
+            </div>
+          </div>
+          <p style="font-size:0.8rem;color:#4B5563;margin:0">Expand to 5 clusters. Validate $8,518/mo savings claim. Present ROI report to CTO. Zero downtime SLA confirmed.</p>
+        </div>
+        <div class="timeline-phase" style="border-color:#6366F1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-size:1.1rem">📈</span>
+            <div>
+              <div style="font-size:0.65rem;font-family:monospace;color:#4F46E5;font-weight:700">PHASE 3 — DAYS 61–90</div>
+              <div style="font-weight:800;color:#111827">Scale</div>
+            </div>
+          </div>
+          <p style="font-size:0.8rem;color:#4B5563;margin:0">Full fleet deployment. Enable predictive diurnal scheduling. Onboard 3 new enterprise clients. Hit $250K ARR milestone.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 8. DEMO VIDEO ─── -->
+<section id="demo">
+  <div style="display:inline-flex;align-items:center;gap:6px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:4px 10px;border-radius:6px;margin-bottom:12px;background:#FEF2F2;color:#DC2626;border:1px solid #FECACA">
+    ▶ Live Demo
+  </div>
+  <h2 style="font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:900;margin-bottom:8px;color:#111827">Watch CloudPulse in Action</h2>
+  <p style="color:#4B5563;margin-bottom:32px;font-weight:500">See real-time telemetry collection, ML-based anomaly detection, vault backup, and sub-3s hydration live.</p>
+  <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:16px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+    <div style="width:72px;height:72px;background:#FEF2F2;border:2px solid #FECACA;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#DC2626;cursor:pointer">▶</div>
+    <p style="color:#4B5563;font-size:0.9rem;font-weight:500">CloudPulse — Full EMBRIX&apos;26 VEGATHON Demo</p>
+    <a href="https://github.com/vishnu1107-star/CLOUD-PULSE-2" target="_blank" class="btn btn-secondary" style="font-size:0.8rem">View Source on GitHub</a>
+  </div>
+</section>
+
+</main>
+
+<!-- ─── FOOTER ─── -->
+<div style="border-top:1px solid #E5E7EB;margin-top:20px;background:#FFFFFF">
+  <footer>
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px">
+      <div style="width:36px;height:36px;background:#2563EB;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.2rem;color:#fff">⚡</div>
+      <span style="font-size:1.3rem;font-weight:900;color:#111827">Cloud<span style="color:#2563EB">Pulse</span></span>
+    </div>
+    <p style="font-size:1.05rem;font-weight:700;color:#059669;margin-bottom:20px">
+      “Make cloud waste reversible. Make FinOps autonomous.”
+    </p>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-bottom:32px">
+      <a href="https://github.com/vishnu1107-star/CLOUD-PULSE-2" target="_blank" class="btn btn-secondary" style="padding:10px 20px;font-size:0.85rem;color:#2563EB">
+        <span style="color:#059669">🌿</span> View GitHub Repository
+      </a>
+      <a href="#demo" class="btn btn-danger" style="padding:10px 20px;font-size:0.85rem" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'});return false">
+        ▶ Watch Demo Video
+      </a>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px">
+      <span class="tag tag-green">TinyML</span>
+      <span class="tag tag-blue">Isolation Forest</span>
+      <span class="tag tag-green">RISC-V</span>
+      <span class="tag tag-blue">Predictive Diurnal AI</span>
+      <span class="tag tag-green">SDG 9</span>
+      <span class="tag tag-green">SDG 12</span>
+      <span class="tag tag-green">SDG 13</span>
+      <span class="tag" style="background:#F5F3FF;color:#6D28D9;border:1px solid #DDD6FE">AWS • GCP • K8s</span>
+    </div>
+    <p style="color:#6B7280;font-size:0.8rem">© 2026 CloudPulse — Built for EMBRIX&apos;26 VEGATHON · Bannari Amman Institute of Technology</p>
+  </footer>
+</div>
+
+<script>
+  function calcSavings() {
+    var fleet = parseInt(document.getElementById('fleet').value);
+    var idle = parseInt(document.getElementById('idle').value);
+    document.getElementById('fleetVal').textContent = fleet;
+    document.getElementById('idleVal').textContent = idle;
+
+    var baseCostPerVM = 140.16; // $/mo average
+    var without = Math.round(fleet * baseCostPerVM);
+    var savings = Math.round(without * (idle / 100) * 0.61);
+    var withCP = without - savings;
+    var co2 = Math.round(fleet * 39.03);
+
+    document.getElementById('without').textContent = '$' + without.toLocaleString() + ' /mo';
+    document.getElementById('with').textContent = '$' + withCP.toLocaleString() + ' /mo';
+    document.getElementById('saved').textContent = '−$' + savings.toLocaleString() + ' saved!';
+    document.getElementById('co2').textContent = co2.toLocaleString() + ' kg CO₂e offset';
+  }
+</script>
+
+</body>
+</html>

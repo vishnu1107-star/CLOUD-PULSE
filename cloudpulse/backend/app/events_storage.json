@@ -1,0 +1,31 @@
+[
+  {
+    "id": "evt-0004",
+    "timestamp": "03:58:35",
+    "stage": "DEMO",
+    "message": "Demo state reset: All 10 resources RUNNING, Vault baseline ready.",
+    "status": "SUCCESS",
+    "resource_id": null
+  },
+  {
+    "id": "evt-01",
+    "timestamp": "03:58:35",
+    "stage": "VEGA",
+    "message": "VEGA ARIES probe connected via edge driver",
+    "status": "INFO"
+  },
+  {
+    "id": "evt-02",
+    "timestamp": "03:58:35",
+    "stage": "TELEMETRY",
+    "message": "Telemetry received: 10 managed workloads streaming metrics",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "evt-03",
+    "timestamp": "03:58:35",
+    "stage": "TINYML",
+    "message": "TinyML pre-filter active on VEGA edge layer",
+    "status": "SUCCESS"
+  }
+]

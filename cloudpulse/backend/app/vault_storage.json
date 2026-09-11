@@ -1,0 +1,41 @@
+{
+  "snapshots": {
+    "staging-api": {
+      "snapshot_id": "VP-00192",
+      "resource_id": "staging-api",
+      "resource_name": "staging-api",
+      "created_at": "2026-09-11 03:58:35 UTC",
+      "size_gb": 45.0,
+      "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "integrity": "VERIFIED",
+      "status": "VAULTED",
+      "restore_available": true,
+      "reversible": true,
+      "state_payload": {
+        "state": "STOPPED",
+        "ports": [
+          80,
+          443
+        ],
+        "env": "Staging"
+      }
+    },
+    "dev-cluster": {
+      "snapshot_id": "VP-00193",
+      "resource_id": "dev-cluster",
+      "resource_name": "dev-cluster",
+      "created_at": "2026-09-11 03:58:35 UTC",
+      "size_gb": 120.0,
+      "checksum": "a85c98fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855aa12",
+      "integrity": "VERIFIED",
+      "status": "VAULTED",
+      "restore_available": true,
+      "reversible": true,
+      "state_payload": {
+        "replicas": 0,
+        "namespace": "dev"
+      }
+    }
+  },
+  "hydration_history": []
+}
