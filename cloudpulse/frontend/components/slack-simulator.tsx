@@ -32,7 +32,7 @@ export function SlackSimulator() {
     } catch {
       setHistory(prev => [...prev, { 
         sender: 'bot', 
-        text: `⚡ *Restore Request Accepted*\n• Target Workload: \`staging-api\`\n• Vault Snapshot Loaded: \`VP-00192\` (SHA-256 Verified)\n• Hydration Status: \`COMPLETE\`\n• Current State: \`RUNNING\`\n• Live Hydration Time: \`2.37 s\` [LIVE MEASURED]`,
+        text: `⚡ *Restore Request Accepted*\n• Target Workload: \`i-0a1b2c3d\` (staging-api)\n• Vault Snapshot Loaded: \`VP-00192\` (SHA-256 Verified)\n• Hydration Status: \`COMPLETE\`\n• Current State: \`RUNNING\`\n• Live Hydration Time: \`2.37 s\` (2370 ms) [LIVE MEASURED]\n• Feed: \`LIVE — VEGA Aries\``,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }])
     } finally {

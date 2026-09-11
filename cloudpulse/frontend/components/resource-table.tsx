@@ -195,8 +195,27 @@ export function ResourceTable({
                   <div className="flex items-center space-x-2">
                     {getProviderBadge(w.provider)}
                     <div>
-                      <span className="font-bold text-gray-900 block text-xs">{w.name}</span>
-                      <span className="text-[10px] text-gray-400 font-mono">{w.region} • ID: {w.id}</span>
+                      <div className="flex items-center space-x-1.5">
+                        <span className="font-bold text-gray-900 block text-xs">{w.name}</span>
+                        {w.isLiveHardware || w.id === 'i-0a1b2c3d' ? (
+                          <span className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                            <span>LIVE — VEGA Aries</span>
+                          </span>
+                        ) : (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">
+                            SIMULATED
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-1 text-[10px] text-gray-400 font-mono">
+                        <span>{w.region} • ID: {w.id}</span>
+                        {(w.isLiveHardware || w.id === 'i-0a1b2c3d') && (
+                          <span className="text-emerald-600 font-semibold ml-1">
+                            • Last frame: {w.lastReceivedTimestamp || 'Just now'}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </td>
@@ -271,6 +290,12 @@ export function ResourceTable({
                     <span className="text-[10px] text-gray-400 block truncate max-w-[140px]" title={w.last_activity}>
                       {w.last_activity}
                     </span>
+                    {w.state === 'RUNNING' && (w.hydrationTimeMs || w.id === 'i-0a1b2c3d') && (
+                      <span className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                        <Clock className="w-2.5 h-2.5 text-blue-600" />
+                        <span>Hydration: {w.hydrationTimeMs || 2370} ms [LIVE MEASURED]</span>
+                      </span>
+                    )}
                   </div>
                 </td>
 

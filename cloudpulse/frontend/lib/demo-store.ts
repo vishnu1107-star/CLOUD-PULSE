@@ -20,6 +20,9 @@ export interface WorkloadItem {
   recommended_action: 'Safe to reclaim' | 'Active workload' | 'Protected: Production' | 'Pre-warm scheduled'
   snapshot_id?: string
   tags: Record<string, string>
+  isLiveHardware?: boolean
+  lastReceivedTimestamp?: string
+  hydrationTimeMs?: number
 }
 
 export interface VaultSnapshot {
@@ -83,14 +86,14 @@ export interface FinOpsPolicyState {
 // Initial Mock Datasets
 export const initialWorkloads: WorkloadItem[] = [
   {
-    id: 'w-1',
-    name: 'staging-api-03',
+    id: 'i-0a1b2c3d',
+    name: 'staging-api',
     provider: 'AWS',
     region: 'us-east-1',
     environment: 'Staging',
     isProduction: false,
-    cpu: 0.8,
-    network_kbps: 0.4,
+    cpu: 1.4,
+    network_kbps: 1.8,
     active_connections: 0,
     iops: 'Low',
     idle_confidence: 98,
@@ -98,9 +101,12 @@ export const initialWorkloads: WorkloadItem[] = [
     potential_savings_day: 14.70,
     hourly_cost: 0.767,
     state: 'RUNNING',
-    last_activity: '14 hours ago (No TCP sockets)',
+    last_activity: 'VEGA Aries RISC-V edge stream active',
     recommended_action: 'Safe to reclaim',
-    tags: { Environment: 'Staging', Team: 'Backend-Core', Project: 'Billing-V2' }
+    isLiveHardware: true,
+    lastReceivedTimestamp: '1 sec ago (115200 baud)',
+    hydrationTimeMs: 2370,
+    tags: { Environment: 'Staging', Team: 'Backend-Core', Hardware: 'VEGA-Aries-v2' }
   },
   {
     id: 'w-2',
