@@ -29,6 +29,7 @@ interface WorkloadInspectModalProps {
 
 export function WorkloadInspectModal({ workload, isOpen, onClose, onReclaim, onHydrate }: WorkloadInspectModalProps) {
   const [vegaStatus, setVegaStatus] = useState<string | null>(null)
+  const [vegaConnected, setVegaConnected] = useState<boolean | null>(null)
   const [analysisData, setAnalysisData] = useState<any>(null)
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false)
 
@@ -40,26 +41,35 @@ export function WorkloadInspectModal({ workload, isOpen, onClose, onReclaim, onH
         .then((data) => {
           setAnalysisData(data)
           if (data && data.vega_led) {
-            setVegaStatus(data.vega_led.led_info || data.real_status)
+            const isConn = Boolean(data.vega_led.connected)
+            setVegaConnected(isConn)
+            if (!isConn && data.vega_led.status === 'VEGA_OFFLINE') {
+              setVegaStatus(data.vega_led.led_info || 'VEGA OFFLINE (COM6 Disconnected)')
+            } else {
+              setVegaStatus(data.vega_led.led_info || data.real_status)
+            }
           } else {
-            const isRunning = workload.state === 'RUNNING' && workload.cpu >= 5.0
-            setVegaStatus(isRunning ? 'GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)' : 'RED (GPIO 14 = LOW, GPIO 13 = HIGH)')
+            setVegaConnected(false)
+            setVegaStatus('VEGA OFFLINE (COM6 Disconnected)')
           }
         })
         .catch(() => {
-          const isRunning = workload.state === 'RUNNING' && !workload.isProduction
-          setVegaStatus(isRunning ? 'GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)' : 'RED (GPIO 14 = LOW, GPIO 13 = HIGH)')
+          setVegaConnected(false)
+          setVegaStatus('VEGA OFFLINE (COM6 Disconnected)')
         })
         .finally(() => {
           setIsAnalyzing(false)
         })
     } else {
       setVegaStatus(null)
+      setVegaConnected(null)
       setAnalysisData(null)
     }
   }, [isOpen, workload])
 
   if (!isOpen || !workload) return null
+
+  const isVegaOffline = vegaConnected === false || (vegaStatus && vegaStatus.includes('OFFLINE'))
 
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
@@ -94,16 +104,16 @@ export function WorkloadInspectModal({ workload, isOpen, onClose, onReclaim, onH
         {/* VEGA Aries V2 Hardware Indicator */}
         <div className="p-3 bg-slate-900 text-white rounded-2xl flex items-center justify-between text-xs border border-slate-800 shadow-md">
           <div className="flex items-center space-x-2">
-            <Radio className={`w-4 h-4 text-emerald-400 ${isAnalyzing ? 'animate-spin' : ''}`} />
+            <Radio className={`w-4 h-4 ${isAnalyzing ? 'animate-spin text-blue-400' : (isVegaOffline ? 'text-rose-400' : 'text-emerald-400')}`} />
             <div>
               <span className="font-bold block text-[11px] text-slate-300">VEGA Aries V2 Hardware Signal:</span>
-              <span className="font-mono text-xs font-extrabold text-emerald-400">
-                {isAnalyzing ? 'Querying CloudPulse Status...' : (vegaStatus || 'ACTIVE (COM6 Sync)')}
+              <span className={`font-mono text-xs font-extrabold ${isVegaOffline ? 'text-rose-400' : 'text-emerald-400'}`}>
+                {isAnalyzing ? 'Querying CloudPulse Status...' : (vegaStatus || (isVegaOffline ? 'VEGA OFFLINE (COM6 Disconnected)' : 'ACTIVE (COM6 Sync)'))}
               </span>
             </div>
           </div>
-          <span className="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-mono font-bold text-slate-300 border border-slate-700">
-            COM6 @ 115200
+          <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${isVegaOffline ? 'bg-rose-950/60 text-rose-300 border-rose-800' : 'bg-slate-800 text-slate-300 border-slate-700'}`}>
+            {isVegaOffline ? 'COM6 OFFLINE' : 'COM6 @ 115200'}
           </span>
         </div>
 

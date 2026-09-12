@@ -78,9 +78,12 @@ async def slack_slash_command(
         tokens = text_clean.replace("wakeup", "").strip().split()
         target_token = tokens[0] if tokens and not tokens[0].startswith("--") else "staging-api"
         
-        # Check if target matches a resource_id directly
+        # Check if target matches a resource_id or resource_name directly
         res_q = await db.execute(select(Resource).where(Resource.resource_id == target_token))
         target_res = res_q.scalars().first()
+        if not target_res:
+            res_q = await db.execute(select(Resource).where(Resource.resource_name.ilike(f"%{target_token}%")))
+            target_res = res_q.scalars().first()
 
         if target_res:
             # Handle duplicate wakeup safely (Test 7)

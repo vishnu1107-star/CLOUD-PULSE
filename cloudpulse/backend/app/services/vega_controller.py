@@ -20,12 +20,23 @@ class VegaController:
         self,
         port: str = "COM6",
         baud_rate: int = 115200,
-        timeout: float = 0.2
+        timeout: float = 0.2,
+        simulation_mode: bool = False
     ):
         self.port = port
         self.baud_rate = baud_rate
         self.timeout = timeout
+        self.simulation_mode = simulation_mode
         self.serial_connection = None
+
+    def is_connected(self) -> bool:
+        """Check if physical VEGA serial connection is active and open."""
+        return bool(self.serial_connection and self.serial_connection.is_open)
+
+    def set_simulation_mode(self, enabled: bool):
+        """Enable or disable explicit software simulation fallback mode."""
+        self.simulation_mode = enabled
+        logger.info("[VEGA] Simulation mode set to: %s", enabled)
 
     def connect(self) -> bool:
         """Open the physical VEGA serial connection."""
@@ -50,8 +61,8 @@ class VegaController:
             return True
 
         except Exception as exc:
-            logger.error(
-                "VEGA connection failed on %s: %s",
+            logger.warning(
+                "VEGA connection unavailable on %s: %s",
                 self.port,
                 exc
             )
@@ -76,31 +87,59 @@ class VegaController:
         network: float,
         sockets: int,
         iops: float,
-        memory: float = 18.0
+        memory: float = 18.0,
+        allow_simulation: bool = False
     ) -> Dict[str, Any]:
         """
-        Send telemetry to VEGA Aries V2 (or software interlock fallback if COM6 is offline).
+        Send telemetry to physical VEGA Aries V2 for hardware safety validation.
 
-        Reclamation is allowed ONLY if VEGA returns APPROVED.
+        When physical VEGA is connected:
+        - Sends UART frame: EVAL,<cpu>,<network>,<sockets>,<iops>,<memory>
+        - Reclaims allowed ONLY if VEGA hardware returns APPROVED.
+
+        When physical VEGA is disconnected/offline:
+        - Returns VEGA_OFFLINE failure (approved=False).
+        - Unsafe hardware-dependent actions are blocked safely.
+
+        When software simulation is explicitly enabled:
+        - Evaluates software rule thresholds and tags decision with mode='SIMULATION'.
         """
 
+        use_simulation = allow_simulation or self.simulation_mode
+
+        # Check physical hardware connection
         if not self.connect():
-            # Software VEGA Interlock Fallback when physical FPGA board is not connected
-            is_safe = (cpu < 2.5) and (network < 10.0) and (int(sockets) == 0) and (iops <= 5.0)
-            if is_safe:
-                logger.info("[VEGA SOFTWARE INTERLOCK] APPROVED: Zero active sockets, CPU < 2.5%, Net < 10 KB/s")
-                return {
-                    "approved": True,
-                    "status": "APPROVED",
-                    "reason": "VEGA software safety validation passed (Zero sockets, CPU < 2.5%)"
-                }
-            else:
-                logger.warning(f"[VEGA SOFTWARE INTERLOCK] REJECTED: Active sockets={sockets}, CPU={cpu}%, Net={network}KB/s")
-                return {
-                    "approved": False,
-                    "status": "REJECTED",
-                    "reason": f"VEGA safety rejection: Sockets={sockets}, CPU={cpu:.1f}%, Net={network:.1f} KB/s"
-                }
+            if use_simulation:
+                # Explicit software simulation mode (for offline development without hardware)
+                is_safe = (cpu < 2.5) and (network < 10.0) and (int(sockets) == 0) and (iops <= 5.0)
+                if is_safe:
+                    logger.info("[VEGA SIMULATION] APPROVED: Zero active sockets, CPU < 2.5%, Net < 10 KB/s")
+                    return {
+                        "approved": True,
+                        "status": "SIMULATED_APPROVED",
+                        "reason": "VEGA software simulation validation passed (Zero sockets, CPU < 2.5%)",
+                        "hardware_connected": False,
+                        "mode": "SIMULATION"
+                    }
+                else:
+                    logger.warning(f"[VEGA SIMULATION] REJECTED: Active sockets={sockets}, CPU={cpu}%, Net={network}KB/s")
+                    return {
+                        "approved": False,
+                        "status": "SIMULATED_REJECTED",
+                        "reason": f"VEGA simulation safety rejection: Sockets={sockets}, CPU={cpu:.1f}%, Net={network:.1f} KB/s",
+                        "hardware_connected": False,
+                        "mode": "SIMULATION"
+                    }
+
+            # Physical VEGA is disconnected / unavailable and simulation mode is NOT enabled
+            logger.warning("[VEGA HARDWARE DISCONNECTED] evaluate_reclamation blocked: Physical VEGA board on %s is offline", self.port)
+            return {
+                "approved": False,
+                "status": "VEGA_OFFLINE",
+                "reason": f"Physical VEGA hardware is offline / disconnected on {self.port}",
+                "hardware_connected": False,
+                "mode": "REAL_VEGA"
+            }
 
         command = (
             f"EVAL,"
@@ -147,51 +186,42 @@ class VegaController:
                         return {
                             "approved": True,
                             "status": "APPROVED",
-                            "reason": "VEGA hardware safety validation passed"
+                            "reason": "VEGA hardware safety validation passed",
+                            "hardware_connected": True,
+                            "mode": "REAL_VEGA"
                         }
 
                     if response.startswith("REJECTED"):
                         return {
                             "approved": False,
                             "status": "REJECTED",
-                            "reason": response
+                            "reason": response,
+                            "hardware_connected": True,
+                            "mode": "REAL_VEGA"
                         }
 
-            # Software VEGA Interlock Fallback if serial hardware didn't respond
-            is_safe = (cpu < 2.5) and (network < 10.0) and (int(sockets) == 0) and (iops <= 5.0)
-            if is_safe:
-                logger.info("[VEGA SOFTWARE INTERLOCK FALLBACK] APPROVED: Zero active sockets, CPU < 2.5%, Net < 10 KB/s")
-                return {
-                    "approved": True,
-                    "status": "APPROVED",
-                    "reason": "VEGA software safety validation passed (Zero sockets, CPU < 2.5%)"
-                }
-            else:
-                logger.warning(f"[VEGA SOFTWARE INTERLOCK FALLBACK] REJECTED: Active sockets={sockets}, CPU={cpu}%, Net={network}KB/s")
-                return {
-                    "approved": False,
-                    "status": "REJECTED",
-                    "reason": f"VEGA safety rejection: Sockets={sockets}, CPU={cpu:.1f}%, Net={network:.1f} KB/s"
-                }
+            # If physical hardware connected but timed out without response
+            logger.warning("[VEGA TIMEOUT] No response received from VEGA on %s within timeout", self.port)
+            return {
+                "approved": False,
+                "status": "VEGA_TIMEOUT",
+                "reason": f"VEGA hardware on {self.port} did not respond within {self.timeout}s timeout window",
+                "hardware_connected": True,
+                "mode": "REAL_VEGA"
+            }
 
         except Exception as exc:
             logger.error("VEGA evaluation error: %s", exc)
             self.disconnect()
-            is_safe = (cpu < 2.5) and (network < 10.0) and (int(sockets) == 0) and (iops <= 5.0)
-            if is_safe:
-                return {
-                    "approved": True,
-                    "status": "APPROVED",
-                    "reason": "VEGA software safety validation passed (Zero sockets, CPU < 2.5%)"
-                }
-            else:
-                return {
-                    "approved": False,
-                    "status": "REJECTED",
-                    "reason": f"VEGA safety rejection: Sockets={sockets}, CPU={cpu:.1f}%, Net={network:.1f} KB/s"
-                }
+            return {
+                "approved": False,
+                "status": "VEGA_ERROR",
+                "reason": f"VEGA hardware serial communication error: {exc}",
+                "hardware_connected": False,
+                "mode": "REAL_VEGA"
+            }
 
-    def set_led_status(self, status: str) -> Dict[str, Any]:
+    def set_led_status(self, status: str, allow_simulation: bool = False) -> Dict[str, Any]:
         """
         Send physical LED command to VEGA Aries V2 over the shared COM6 serial connection.
         
@@ -215,14 +245,30 @@ class VegaController:
             gpio_log = "[VEGA LED] status=OFF GPIO14=LOW GPIO13=LOW"
             led_info = "OFF (Both GPIO 14 & 13 = LOW)"
 
+        use_simulation = allow_simulation or self.simulation_mode
+
         if not self.connect():
-            logger.info(f"{gpio_log} (COM6 serial offline - simulated)")
+            if use_simulation:
+                logger.info(f"{gpio_log} ({self.port} serial offline - software simulated)")
+                return {
+                    "success": True,
+                    "connected": False,
+                    "status": cmd_name,
+                    "led_state": cmd_name,
+                    "led_info": f"{led_info} (Software Simulated)",
+                    "gpio_log": gpio_log + " (Software Simulation mode)",
+                    "mode": "SIMULATION"
+                }
+
+            logger.info(f"[VEGA LED] Physical VEGA disconnected on {self.port} — LED command not transmitted")
             return {
-                "success": True,
-                "status": cmd_name,
-                "led_state": cmd_name,
-                "led_info": led_info,
-                "gpio_log": gpio_log + " (Offline mode)"
+                "success": False,
+                "connected": False,
+                "status": "VEGA_OFFLINE",
+                "led_state": "OFFLINE",
+                "led_info": f"VEGA OFFLINE ({self.port} Disconnected)",
+                "gpio_log": f"[VEGA OFFLINE] Hardware disconnected on {self.port}",
+                "mode": "REAL_VEGA"
             }
 
         command = f"{cmd_name}\n"
@@ -234,18 +280,24 @@ class VegaController:
             self.serial_connection.flush()
             return {
                 "success": True,
+                "connected": True,
                 "status": cmd_name,
                 "led_state": cmd_name,
                 "led_info": led_info,
-                "gpio_log": gpio_log
+                "gpio_log": gpio_log,
+                "mode": "REAL_VEGA"
             }
         except Exception as exc:
             logger.error("Failed to send LED command to VEGA: %s", exc)
             self.disconnect()
             return {
                 "success": False,
+                "connected": False,
                 "status": "VEGA_ERROR",
-                "reason": str(exc)
+                "led_state": "ERROR",
+                "led_info": f"VEGA ERROR ({exc})",
+                "reason": str(exc),
+                "mode": "REAL_VEGA"
             }
 
 

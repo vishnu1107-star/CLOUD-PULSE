@@ -107,6 +107,14 @@ class ActionExecutor:
                 "message": f"Resource {resource_id} not found."
             }
 
+        if resource.state == "RECLAIMED":
+            return {
+                "status": "already_reclaimed",
+                "resource_id": resource_id,
+                "state": "RECLAIMED",
+                "message": f"Resource {resource_id} is already in RECLAIMED state. Duplicate reclaim skipped."
+            }
+
         # -----------------------------------------------------
         # 3. VEGA HARDWARE SAFETY INTERLOCK
         # -----------------------------------------------------

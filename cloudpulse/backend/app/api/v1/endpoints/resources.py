@@ -101,13 +101,15 @@ async def get_resource_detail(resource_id: str, db: AsyncSession = Depends(get_d
         "safety_gate": sg_eval,
         "vault_snapshot": snap,
         "real_status": real_status,
-        "vega_led": vega_res
+        "vega_led": vega_res,
+        "vega_status": vega_res.get("status"),
+        "hardware_connected": vega_res.get("connected", False)
     }
 
 
 @router.post("/{resource_id:path}/analyze")
 async def analyze_resource(resource_id: str, db: AsyncSession = Depends(get_db)):
-    """Runs on-demand multi-signal analysis & safety gate inspection, forwarding real status to VEGA LED."""
+    """Runs on-demand multi-signal analysis & safety gate inspection, forwarding real status to VEGA LED and executing automatic reclaim if safe."""
     q = await db.execute(select(Resource).where(Resource.resource_id == resource_id))
     r = q.scalars().first()
     if not r:
@@ -123,9 +125,18 @@ async def analyze_resource(resource_id: str, db: AsyncSession = Depends(get_db))
     policy = await evaluator.get_or_create_default_policy()
     eval_data = await evaluator.evaluate_resource(r, policy)
     metrics = eval_data.get("metrics", {})
-    sg_eval = SafetyGate.evaluate(metrics=metrics, ml_prediction={"is_idle": eval_data.get("is_idle")})
+    sg_eval = SafetyGate.evaluate(metrics=metrics, ml_prediction={"is_idle": eval_data.get("is_idle"), "classification": eval_data.get("ml_classification")})
 
     is_idle = eval_data.get("is_idle", False)
+    ml_confirmed = eval_data.get("ml_classification") == "TRUE_IDLE"
+    override_active = eval_data.get("override_active", False)
+
+    # Automatic Reclamation Workflow when resource is truly idle & safe:
+    reclaim_result = None
+    if r.state == "RUNNING" and is_idle and ml_confirmed and sg_eval.get("passed", False) and policy.auto_stop_enabled and not override_active:
+        reclaim_result = await reclaim_resource(r.resource_id, db=db)
+        await db.refresh(r)
+
     res_state = (r.state or "RUNNING").upper()
 
     if res_state in ["RECLAIMED", "PAUSED", "STOPPED"] or is_idle:
@@ -146,7 +157,10 @@ async def analyze_resource(resource_id: str, db: AsyncSession = Depends(get_db))
         "real_status": real_status,
         "evaluation": eval_data,
         "safety_gate": sg_eval,
-        "vega_led": vega_result
+        "vega_led": vega_result,
+        "vega_status": vega_result.get("status"),
+        "hardware_connected": vega_result.get("connected", False),
+        "auto_reclaim": reclaim_result
     }
 
 
@@ -205,10 +219,25 @@ async def reclaim_resource(
     r = q.scalars().first()
 
     if not r:
+        q_name = await db.execute(select(Resource).where(Resource.resource_name.ilike(f"%{resource_id}%")))
+        r = q_name.scalars().first()
+
+    if not r:
         raise HTTPException(
             status_code=404,
             detail=f"Resource {resource_id} not found"
         )
+
+    # ---------------------------------------------------------
+    # PREVENT REPEATED RECLAIM CALLS (DUPLICATE PROTECTION)
+    # ---------------------------------------------------------
+    if r.state == "RECLAIMED":
+        return {
+            "status": "already_reclaimed",
+            "resource_id": r.resource_id,
+            "state": "RECLAIMED",
+            "message": f"Resource {resource_id} is already in RECLAIMED state. Duplicate reclaim skipped."
+        }
 
     # ---------------------------------------------------------
     # 1. CLOUDPULSE SAFETY CHECK & EVALUATION
@@ -228,7 +257,7 @@ async def reclaim_resource(
     )
 
     # ---------------------------------------------------------
-    # 2. CLOUDPULSE SAFETY GATE BARRIER
+    # 2. CLOUDPULSE SAFETY GATE & ML BARRIER
     # ---------------------------------------------------------
 
     if not sg_eval["passed"]:
@@ -242,6 +271,14 @@ async def reclaim_resource(
         return {
             "status": "blocked",
             "message": f"Reclamation blocked by Safety Gate: {sg_eval['primary_reason']}",
+            "safety_gate": sg_eval,
+            "vega_status": "REJECTED"
+        }
+
+    if not eval_data.get("is_idle", False) or eval_data.get("ml_classification") != "TRUE_IDLE":
+        return {
+            "status": "blocked",
+            "message": f"Reclamation blocked: ML did not confirm TRUE_IDLE state (classification: {eval_data.get('ml_classification')})",
             "safety_gate": sg_eval,
             "vega_status": "REJECTED"
         }

@@ -44,9 +44,10 @@ async def background_metric_evaluation_loop():
 
                 for item in evaluations:
                     is_idle = item.get("is_idle", False)
+                    ml_confirmed = item.get("ml_classification") == "TRUE_IDLE"
 
                     # Automatic Reclamation Workflow: condition = TRUE and Safety Gate = SAFE_TO_RECLAIM
-                    if policy.auto_stop_enabled and is_idle and not item.get("override_active"):
+                    if policy.auto_stop_enabled and is_idle and ml_confirmed and not item.get("override_active"):
                         result = await reclaim_resource(
                             resource_id=item["resource_id"],
                             db=db

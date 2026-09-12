@@ -10,6 +10,8 @@ from app.engine.event_logger import event_logger
 from app.api.v1.endpoints.edge import ingest_edge_telemetry, TelemetryPayload, simulate_scenario
 from app.api.v1.endpoints.resources import reclaim_resource, restore_resource, reset_demo_state
 from app.api.v1.endpoints.hooks import slack_slash_command
+from app.engine.discovery import DiscoveryEngine
+from app.services.vega_controller import vega_controller
 
 async def run_vegathon_pipeline_tests():
     print("\n========================================================")
@@ -19,7 +21,12 @@ async def run_vegathon_pipeline_tests():
     await init_db()
     vault_mgr = VaultManager()
 
+    # Enable simulation mode for software mock demo pipeline
+    vega_controller.set_simulation_mode(True)
+
     async with AsyncSessionLocal() as db:
+        engine = DiscoveryEngine(db)
+        await engine.run_discovery()
         # TEST 1: Active resource is NOT reclaimed
         print("TEST 1: Verifying active resource is NOT reclaimed...")
         active_res = await simulate_scenario("active")
