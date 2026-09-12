@@ -1,5 +1,421 @@
 [
   {
+    "id": "evt-0056",
+    "timestamp": "06:44:04",
+    "stage": "ANALYSIS",
+    "message": "Evaluated build-runner status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "build-runner"
+  },
+  {
+    "id": "evt-0055",
+    "timestamp": "06:43:57",
+    "stage": "ANALYSIS",
+    "message": "Evaluated test-db status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "test-db"
+  },
+  {
+    "id": "evt-0054",
+    "timestamp": "06:43:29",
+    "stage": "ANALYSIS",
+    "message": "Evaluated i-0a1b2c3d status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "i-0a1b2c3d"
+  },
+  {
+    "id": "evt-0053",
+    "timestamp": "06:43:21",
+    "stage": "SLACK",
+    "message": "Alert: Anomaly detected on i-0m5n6o1p \u2014 resource automatically paused. Protected state: VP-00203.",
+    "status": "INFO",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0052",
+    "timestamp": "06:43:21",
+    "stage": "RECLAIM",
+    "message": "Resource i-0m5n6o1p safely reclaimed. Spend halted.",
+    "status": "SUCCESS",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0051",
+    "timestamp": "06:43:21",
+    "stage": "VAULT",
+    "message": "Pre-reclaim snapshot VP-00203 secured for i-0m5n6o1p",
+    "status": "SUCCESS",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0050",
+    "timestamp": "06:43:21",
+    "stage": "VEGA",
+    "message": "VEGA APPROVED for i-0m5n6o1p: VEGA software safety validation passed (Zero sockets, CPU < 2.5%)",
+    "status": "INFO",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0049",
+    "timestamp": "06:43:19",
+    "stage": "VEGA",
+    "message": "Requesting hardware approval for i-0m5n6o1p",
+    "status": "INFO",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0048",
+    "timestamp": "06:43:18",
+    "stage": "ANALYSIS",
+    "message": "Evaluated i-0m5n6o1p status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0047",
+    "timestamp": "06:43:14",
+    "stage": "HYDRATION",
+    "message": "Resource i-0m5n6o1p restored and RUNNING in 2.343s (LIVE MEASURED)",
+    "status": "SUCCESS",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0046",
+    "timestamp": "06:43:11",
+    "stage": "VAULT",
+    "message": "Loading snapshot for i-0m5n6o1p...",
+    "status": "INFO",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0045",
+    "timestamp": "06:43:11",
+    "stage": "WAKEUP",
+    "message": "Wakeup command received for i-0m5n6o1p",
+    "status": "INFO",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0044",
+    "timestamp": "06:43:00",
+    "stage": "ANALYSIS",
+    "message": "Evaluated i-0a1b2c3d status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "i-0a1b2c3d"
+  },
+  {
+    "id": "evt-0043",
+    "timestamp": "06:42:04",
+    "stage": "ANALYSIS",
+    "message": "Evaluated build-runner status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "build-runner"
+  },
+  {
+    "id": "evt-0042",
+    "timestamp": "06:41:58",
+    "stage": "ANALYSIS",
+    "message": "Evaluated analytics-worker status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "analytics-worker"
+  },
+  {
+    "id": "evt-0041",
+    "timestamp": "06:41:53",
+    "stage": "ANALYSIS",
+    "message": "Evaluated i-0u3v4w5x status=RUNNING: Safety BLOCKED | VEGA LED=GREEN (GPIO 14 = HIGH, GPIO 13 = LOW)",
+    "status": "INFO",
+    "resource_id": "i-0u3v4w5x"
+  },
+  {
+    "id": "evt-0040",
+    "timestamp": "06:41:48",
+    "stage": "ANALYSIS",
+    "message": "Evaluated i-0a1b2c3d status=IDLE: Safety PASSED | VEGA LED=RED (GPIO 14 = LOW, GPIO 13 = HIGH)",
+    "status": "INFO",
+    "resource_id": "i-0a1b2c3d"
+  },
+  {
+    "id": "evt-0039",
+    "timestamp": "06:40:13",
+    "stage": "SLACK",
+    "message": "Alert: Anomaly detected on preview-app \u2014 resource automatically paused. Protected state: VP-00202.",
+    "status": "INFO",
+    "resource_id": "preview-app"
+  },
+  {
+    "id": "evt-0038",
+    "timestamp": "06:40:13",
+    "stage": "RECLAIM",
+    "message": "Resource preview-app safely reclaimed. Spend halted.",
+    "status": "SUCCESS",
+    "resource_id": "preview-app"
+  },
+  {
+    "id": "evt-0037",
+    "timestamp": "06:40:13",
+    "stage": "VAULT",
+    "message": "Pre-reclaim snapshot VP-00202 secured for preview-app",
+    "status": "SUCCESS",
+    "resource_id": "preview-app"
+  },
+  {
+    "id": "evt-0036",
+    "timestamp": "06:40:13",
+    "stage": "VEGA",
+    "message": "VEGA APPROVED for preview-app: VEGA software safety validation passed (Zero sockets, CPU < 2.5%)",
+    "status": "INFO",
+    "resource_id": "preview-app"
+  },
+  {
+    "id": "evt-0035",
+    "timestamp": "06:40:11",
+    "stage": "VEGA",
+    "message": "Requesting hardware approval for preview-app",
+    "status": "INFO",
+    "resource_id": "preview-app"
+  },
+  {
+    "id": "evt-0034",
+    "timestamp": "06:40:11",
+    "stage": "SLACK",
+    "message": "Alert: Anomaly detected on analytics-worker \u2014 resource automatically paused. Protected state: VP-00201.",
+    "status": "INFO",
+    "resource_id": "analytics-worker"
+  },
+  {
+    "id": "evt-0033",
+    "timestamp": "06:40:11",
+    "stage": "RECLAIM",
+    "message": "Resource analytics-worker safely reclaimed. Spend halted.",
+    "status": "SUCCESS",
+    "resource_id": "analytics-worker"
+  },
+  {
+    "id": "evt-0032",
+    "timestamp": "06:40:11",
+    "stage": "VAULT",
+    "message": "Pre-reclaim snapshot VP-00201 secured for analytics-worker",
+    "status": "SUCCESS",
+    "resource_id": "analytics-worker"
+  },
+  {
+    "id": "evt-0031",
+    "timestamp": "06:40:11",
+    "stage": "VEGA",
+    "message": "VEGA APPROVED for analytics-worker: VEGA software safety validation passed (Zero sockets, CPU < 2.5%)",
+    "status": "INFO",
+    "resource_id": "analytics-worker"
+  },
+  {
+    "id": "evt-0030",
+    "timestamp": "06:40:09",
+    "stage": "VEGA",
+    "message": "Requesting hardware approval for analytics-worker",
+    "status": "INFO",
+    "resource_id": "analytics-worker"
+  },
+  {
+    "id": "evt-0029",
+    "timestamp": "06:40:09",
+    "stage": "SLACK",
+    "message": "Alert: Anomaly detected on ci-runner \u2014 resource automatically paused. Protected state: VP-00200.",
+    "status": "INFO",
+    "resource_id": "ci-runner"
+  },
+  {
+    "id": "evt-0028",
+    "timestamp": "06:40:09",
+    "stage": "RECLAIM",
+    "message": "Resource ci-runner safely reclaimed. Spend halted.",
+    "status": "SUCCESS",
+    "resource_id": "ci-runner"
+  },
+  {
+    "id": "evt-0027",
+    "timestamp": "06:40:09",
+    "stage": "VAULT",
+    "message": "Pre-reclaim snapshot VP-00200 secured for ci-runner",
+    "status": "SUCCESS",
+    "resource_id": "ci-runner"
+  },
+  {
+    "id": "evt-0026",
+    "timestamp": "06:40:09",
+    "stage": "VEGA",
+    "message": "VEGA APPROVED for ci-runner: VEGA software safety validation passed (Zero sockets, CPU < 2.5%)",
+    "status": "INFO",
+    "resource_id": "ci-runner"
+  },
+  {
+    "id": "evt-0025",
+    "timestamp": "06:40:07",
+    "stage": "VEGA",
+    "message": "Requesting hardware approval for ci-runner",
+    "status": "INFO",
+    "resource_id": "ci-runner"
+  },
+  {
+    "id": "evt-0024",
+    "timestamp": "06:40:07",
+    "stage": "SLACK",
+    "message": "Alert: Anomaly detected on i-0m5n6o1p \u2014 resource automatically paused. Protected state: VP-00199.",
+    "status": "INFO",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0023",
+    "timestamp": "06:40:07",
+    "stage": "RECLAIM",
+    "message": "Resource i-0m5n6o1p safely reclaimed. Spend halted.",
+    "status": "SUCCESS",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0022",
+    "timestamp": "06:40:07",
+    "stage": "VAULT",
+    "message": "Pre-reclaim snapshot VP-00199 secured for i-0m5n6o1p",
+    "status": "SUCCESS",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0021",
+    "timestamp": "06:40:07",
+    "stage": "VEGA",
+    "message": "VEGA APPROVED for i-0m5n6o1p: VEGA software safety validation passed (Zero sockets, CPU < 2.5%)",
+    "status": "INFO",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0020",
+    "timestamp": "06:40:05",
+    "stage": "VEGA",
+    "message": "Requesting hardware approval for i-0m5n6o1p",
+    "status": "INFO",
+    "resource_id": "i-0m5n6o1p"
+  },
+  {
+    "id": "evt-0019",
+    "timestamp": "06:40:05",
+    "stage": "SLACK",
+    "message": "Alert: Anomaly detected on i-0q7r8s9t \u2014 resource automatically paused. Protected state: VP-00198.",
+    "status": "INFO",
+    "resource_id": "i-0q7r8s9t"
+  },
+  {
+    "id": "evt-0018",
+    "timestamp": "06:40:05",
+    "stage": "RECLAIM",
+    "message": "Resource i-0q7r8s9t safely reclaimed. Spend halted.",
+    "status": "SUCCESS",
+    "resource_id": "i-0q7r8s9t"
+  },
+  {
+    "id": "evt-0017",
+    "timestamp": "06:40:05",
+    "stage": "VAULT",
+    "message": "Pre-reclaim snapshot VP-00198 secured for i-0q7r8s9t",
+    "status": "SUCCESS",
+    "resource_id": "i-0q7r8s9t"
+  },
+  {
+    "id": "evt-0016",
+    "timestamp": "06:40:05",
+    "stage": "VEGA",
+    "message": "VEGA APPROVED for i-0q7r8s9t: VEGA software safety validation passed (Zero sockets, CPU < 2.5%)",
+    "status": "INFO",
+    "resource_id": "i-0q7r8s9t"
+  },
+  {
+    "id": "evt-0015",
+    "timestamp": "06:40:03",
+    "stage": "VEGA",
+    "message": "Requesting hardware approval for i-0q7r8s9t",
+    "status": "INFO",
+    "resource_id": "i-0q7r8s9t"
+  },
+  {
+    "id": "evt-0014",
+    "timestamp": "06:40:03",
+    "stage": "SLACK",
+    "message": "Alert: Anomaly detected on i-0e4f5g6h \u2014 resource automatically paused. Protected state: VP-00197.",
+    "status": "INFO",
+    "resource_id": "i-0e4f5g6h"
+  },
+  {
+    "id": "evt-0013",
+    "timestamp": "06:40:03",
+    "stage": "RECLAIM",
+    "message": "Resource i-0e4f5g6h safely reclaimed. Spend halted.",
+    "status": "SUCCESS",
+    "resource_id": "i-0e4f5g6h"
+  },
+  {
+    "id": "evt-0012",
+    "timestamp": "06:40:03",
+    "stage": "VAULT",
+    "message": "Pre-reclaim snapshot VP-00197 secured for i-0e4f5g6h",
+    "status": "SUCCESS",
+    "resource_id": "i-0e4f5g6h"
+  },
+  {
+    "id": "evt-0011",
+    "timestamp": "06:40:03",
+    "stage": "VEGA",
+    "message": "VEGA APPROVED for i-0e4f5g6h: VEGA software safety validation passed (Zero sockets, CPU < 2.5%)",
+    "status": "INFO",
+    "resource_id": "i-0e4f5g6h"
+  },
+  {
+    "id": "evt-0010",
+    "timestamp": "06:40:01",
+    "stage": "VEGA",
+    "message": "Requesting hardware approval for i-0e4f5g6h",
+    "status": "INFO",
+    "resource_id": "i-0e4f5g6h"
+  },
+  {
+    "id": "evt-0009",
+    "timestamp": "06:40:00",
+    "stage": "SLACK",
+    "message": "Alert: Anomaly detected on i-0a1b2c3d \u2014 resource automatically paused. Protected state: VP-00196.",
+    "status": "INFO",
+    "resource_id": "i-0a1b2c3d"
+  },
+  {
+    "id": "evt-0008",
+    "timestamp": "06:40:00",
+    "stage": "RECLAIM",
+    "message": "Resource i-0a1b2c3d safely reclaimed. Spend halted.",
+    "status": "SUCCESS",
+    "resource_id": "i-0a1b2c3d"
+  },
+  {
+    "id": "evt-0007",
+    "timestamp": "06:40:00",
+    "stage": "VAULT",
+    "message": "Pre-reclaim snapshot VP-00196 secured for i-0a1b2c3d",
+    "status": "SUCCESS",
+    "resource_id": "i-0a1b2c3d"
+  },
+  {
+    "id": "evt-0006",
+    "timestamp": "06:40:00",
+    "stage": "VEGA",
+    "message": "VEGA APPROVED for i-0a1b2c3d: VEGA software safety validation passed (Zero sockets, CPU < 2.5%)",
+    "status": "INFO",
+    "resource_id": "i-0a1b2c3d"
+  },
+  {
+    "id": "evt-0005",
+    "timestamp": "06:39:58",
+    "stage": "VEGA",
+    "message": "Requesting hardware approval for i-0a1b2c3d",
+    "status": "INFO",
+    "resource_id": "i-0a1b2c3d"
+  },
+  {
     "id": "evt-0004",
     "timestamp": "06:39:16",
     "stage": "DEMO",
