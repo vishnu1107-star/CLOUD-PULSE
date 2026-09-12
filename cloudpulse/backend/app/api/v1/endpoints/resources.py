@@ -211,7 +211,7 @@ async def reclaim_resource(
         )
 
     # ---------------------------------------------------------
-    # 1. CLOUDPULSE SAFETY CHECK
+    # 1. CLOUDPULSE SAFETY CHECK & EVALUATION
     # ---------------------------------------------------------
 
     metrics = SimulatedCloudDriver.get_simulated_metrics(
@@ -220,23 +220,38 @@ async def reclaim_resource(
     )
 
     evaluator = IdleEvaluator(db)
-
     policy = await evaluator.get_or_create_default_policy()
-
-    eval_data = await evaluator.evaluate_resource(
-        r,
-        policy
-    )
+    eval_data = await evaluator.evaluate_resource(r, policy)
 
     sg_eval = SafetyGate.evaluate(
         metrics=metrics,
         ml_prediction={
-            "is_idle": eval_data.get("is_idle")
+            "is_idle": eval_data.get("is_idle"),
+            "classification": eval_data.get("ml_classification")
         }
     )
 
     # ---------------------------------------------------------
-    # 2. VEGA ARIES V2 HARDWARE SAFETY INTERLOCK
+    # 2. CLOUDPULSE SAFETY GATE BARRIER
+    # ---------------------------------------------------------
+
+    if not sg_eval["passed"]:
+        event_logger.log_event(
+            "SAFETY_GATE",
+            f"Reclaim BLOCKED for {resource_id}: {sg_eval['primary_reason']}",
+            "WARNING",
+            resource_id
+        )
+
+        return {
+            "status": "blocked",
+            "message": f"Reclamation blocked by Safety Gate: {sg_eval['primary_reason']}",
+            "safety_gate": sg_eval,
+            "vega_status": "REJECTED"
+        }
+
+    # ---------------------------------------------------------
+    # 3. VEGA ARIES V2 HARDWARE SAFETY INTERLOCK
     # ---------------------------------------------------------
 
     event_logger.log_event(
@@ -247,76 +262,27 @@ async def reclaim_resource(
     )
 
     vega_result = vega_controller.evaluate_reclamation(
-        cpu=float(
-            metrics.get("cpu_utilization", 0.0)
-        ),
-        network=float(
-            metrics.get("network_kbps", 0.0)
-        ),
-        sockets=int(
-            metrics.get("active_connections", 0)
-        ),
-        iops=float(
-            metrics.get("disk_io_iops", 0.0)
-        ),
-        memory=float(
-            metrics.get("memory_pct", 18.0)
-        )
+        cpu=float(metrics.get("cpu_utilization", 0.0)),
+        network=float(metrics.get("network_kbps", 0.0)),
+        sockets=int(metrics.get("active_connections", 0)),
+        iops=float(metrics.get("disk_io_iops", 0.0)),
+        memory=float(metrics.get("memory_pct", 18.0))
     )
 
     event_logger.log_event(
         "VEGA",
-        (
-            f"VEGA {vega_result.get('status')} "
-            f"for {resource_id}: "
-            f"{vega_result.get('reason', '')}"
-        ),
-        "INFO"
-        if vega_result.get("approved")
-        else "WARNING",
+        f"VEGA {vega_result.get('status')} for {resource_id}: {vega_result.get('reason', '')}",
+        "INFO" if vega_result.get("approved") else "WARNING",
         resource_id
     )
 
-    # ---------------------------------------------------------
-    # BLOCK IF VEGA REJECTS OR IS OFFLINE
-    # ---------------------------------------------------------
-
     if not vega_result.get("approved", False):
-
         return {
             "status": "blocked",
-            "message": (
-                "Reclamation blocked by VEGA Aries V2 "
-                "hardware safety interlock"
-            ),
+            "message": f"Reclamation blocked by VEGA hardware safety interlock: {vega_result.get('reason')}",
             "vega_status": vega_result.get("status"),
             "vega_reason": vega_result.get("reason"),
             "safety_gate": sg_eval
-        }
-
-    # ---------------------------------------------------------
-    # 3. CLOUDPULSE SAFETY GATE
-    # ---------------------------------------------------------
-
-    if not sg_eval["passed"]:
-
-        event_logger.log_event(
-            "SAFETY_GATE",
-            (
-                f"Reclaim BLOCKED for {resource_id}: "
-                f"{sg_eval['primary_reason']}"
-            ),
-            "WARNING",
-            resource_id
-        )
-
-        return {
-            "status": "blocked",
-            "message": (
-                "Reclamation blocked by Safety Gate"
-            ),
-            "safety_gate": sg_eval,
-            "vega_status": "APPROVED"
         }
 
     # ---------------------------------------------------------
@@ -336,52 +302,34 @@ async def reclaim_resource(
 
     event_logger.log_event(
         "VAULT",
-        (
-            f"Pre-reclaim snapshot "
-            f"{snap['snapshot_id']} secured"
-        ),
+        f"Pre-reclaim snapshot {snap['snapshot_id']} secured for {resource_id}",
         "SUCCESS",
         resource_id
     )
 
     # ---------------------------------------------------------
-    # 5. RECLAIM RESOURCE
+    # 5. RECLAIM RESOURCE & UPDATE LED
     # ---------------------------------------------------------
 
     r.state = "RECLAIMED"
-
     r.last_activity_timestamp = datetime.utcnow()
-
     await db.commit()
 
-    # ---------------------------------------------------------
-    # 6. LOG RECLAMATION
-    # ---------------------------------------------------------
+    vega_controller.set_led_status("RECLAIMED")
 
     event_logger.log_event(
         "RECLAIM",
-        (
-            f"Resource {resource_id} safely reclaimed. "
-            f"Spend halted."
-        ),
+        f"Resource {resource_id} safely reclaimed. Spend halted.",
         "SUCCESS",
         resource_id
     )
 
     event_logger.log_event(
         "SLACK",
-        (
-            f"Alert: Anomaly detected on {resource_id} "
-            f"— resource automatically paused. "
-            f"Protected state: {snap['snapshot_id']}."
-        ),
+        f"Alert: Anomaly detected on {resource_id} — resource automatically paused. Protected state: {snap['snapshot_id']}.",
         "INFO",
         resource_id
     )
-
-    # ---------------------------------------------------------
-    # 7. RESPONSE
-    # ---------------------------------------------------------
 
     return {
         "status": "success",
@@ -404,28 +352,34 @@ async def restore_resource(resource_id: str, db: AsyncSession = Depends(get_db))
     q = await db.execute(select(Resource).where(Resource.resource_id == resource_id))
     r = q.scalars().first()
     if not r:
+        q_name = await db.execute(select(Resource).where(Resource.resource_name.ilike(f"%{resource_id}%")))
+        r = q_name.scalars().first()
+
+    if not r:
         raise HTTPException(status_code=404, detail=f"Resource {resource_id} not found")
 
-    event_logger.log_event("WAKEUP", f"Wakeup command received for {resource_id}", "INFO", resource_id)
-    event_logger.log_event("VAULT", f"Loading snapshot for {resource_id}...", "INFO", resource_id)
+    event_logger.log_event("WAKEUP", f"Wakeup command received for {r.resource_id}", "INFO", r.resource_id)
+    event_logger.log_event("VAULT", f"Loading snapshot for {r.resource_id}...", "INFO", r.resource_id)
 
     # Set temporary intermediate state
     r.state = "RESTORING"
     await db.commit()
 
     # Measured live hydration
-    hydration_result = await vault_mgr.restore_workload(resource_id)
+    hydration_result = await vault_mgr.restore_workload(r.resource_id)
 
     # Set final restored state
     r.state = "RUNNING"
     r.last_activity_timestamp = datetime.utcnow()
     await db.commit()
 
-    event_logger.log_event("HYDRATION", f"Resource {resource_id} restored and RUNNING in {hydration_result['hydration_time_seconds']}s (LIVE MEASURED)", "SUCCESS", resource_id)
+    vega_controller.set_led_status("RUNNING")
+
+    event_logger.log_event("HYDRATION", f"Resource {r.resource_id} restored and RUNNING in {hydration_result['hydration_time_seconds']}s (LIVE MEASURED)", "SUCCESS", r.resource_id)
 
     return {
         "status": "success",
-        "resource_id": resource_id,
+        "resource_id": r.resource_id,
         "state": "RUNNING",
         "hydration_time_seconds": hydration_result["hydration_time_seconds"],
         "timing_label": "LIVE MEASURED",

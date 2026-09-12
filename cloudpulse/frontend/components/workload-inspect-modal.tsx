@@ -29,14 +29,16 @@ interface WorkloadInspectModalProps {
 
 export function WorkloadInspectModal({ workload, isOpen, onClose, onReclaim, onHydrate }: WorkloadInspectModalProps) {
   const [vegaStatus, setVegaStatus] = useState<string | null>(null)
+  const [analysisData, setAnalysisData] = useState<any>(null)
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false)
 
   useEffect(() => {
     if (isOpen && workload) {
       setIsAnalyzing(true)
-      const resId = workload.id
+      const resId = workload.id || workload.name
       CloudPulseAPI.analyzeResource(resId)
         .then((data) => {
+          setAnalysisData(data)
           if (data && data.vega_led) {
             setVegaStatus(data.vega_led.led_info || data.real_status)
           } else {
@@ -53,6 +55,7 @@ export function WorkloadInspectModal({ workload, isOpen, onClose, onReclaim, onH
         })
     } else {
       setVegaStatus(null)
+      setAnalysisData(null)
     }
   }, [isOpen, workload])
 

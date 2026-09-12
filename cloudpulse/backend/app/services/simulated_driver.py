@@ -10,25 +10,58 @@ class SimulatedCloudDriver:
         return [
             {
                 "provider": "AWS",
-                "resource_id": "staging-api",
+                "resource_id": "i-0a1b2c3d",
                 "resource_name": "staging-api",
                 "resource_type": "EC2",
                 "region": "us-east-1",
                 "state": "RUNNING",
                 "environment": "Staging",
-                "hourly_cost": 0.192,
-                "tags": {"Environment": "Staging", "Team": "Backend", "CloudPulse": "Managed", "Role": "API"}
+                "hourly_cost": 0.767,
+                "tags": {"Environment": "Staging", "Team": "Backend-Core", "Hardware": "VEGA-Aries-v2"}
             },
             {
-                "provider": "K8S",
-                "resource_id": "dev-cluster",
-                "resource_name": "dev-cluster",
-                "resource_type": "EKS_DEPLOYMENT",
+                "provider": "AWS",
+                "resource_id": "i-0e4f5g6h",
+                "resource_name": "dev-worker",
+                "resource_type": "EC2",
                 "region": "us-west-2",
                 "state": "RUNNING",
                 "environment": "Dev",
-                "hourly_cost": 0.280,
-                "tags": {"Environment": "Dev", "Team": "Platform", "CloudPulse": "Managed"}
+                "hourly_cost": 0.400,
+                "tags": {"Environment": "Dev", "Team": "Frontend", "DataSource": "Bitbrains-GWA-T-12"}
+            },
+            {
+                "provider": "GCP",
+                "resource_id": "i-0q7r8s9t",
+                "resource_name": "qa-runner",
+                "resource_type": "GCE",
+                "region": "us-central1",
+                "state": "RUNNING",
+                "environment": "QA",
+                "hourly_cost": 1.033,
+                "tags": {"Environment": "QA", "Team": "Data-Eng", "DataSource": "Azure-Public-Traces"}
+            },
+            {
+                "provider": "K8S",
+                "resource_id": "i-0m5n6o1p",
+                "resource_name": "batch-worker",
+                "resource_type": "EKS_DEPLOYMENT",
+                "region": "us-east-2",
+                "state": "RUNNING",
+                "environment": "Dev",
+                "hourly_cost": 1.312,
+                "tags": {"Environment": "Dev", "Cluster": "k8s-dev-east", "Namespace": "batch-processing"}
+            },
+            {
+                "provider": "AWS",
+                "resource_id": "i-0u3v4w5x",
+                "resource_name": "sandbox-01",
+                "resource_type": "EC2",
+                "region": "us-east-1",
+                "state": "RUNNING",
+                "environment": "Dev",
+                "hourly_cost": 1.750,
+                "tags": {"Environment": "Dev", "Tier": "Sandbox", "ActiveUser": "dev-team"}
             },
             {
                 "provider": "AWS",
@@ -73,39 +106,6 @@ class SimulatedCloudDriver:
                 "environment": "Dev",
                 "hourly_cost": 0.096,
                 "tags": {"Environment": "Dev", "PR": "492"}
-            },
-            {
-                "provider": "GCP",
-                "resource_id": "qa-api",
-                "resource_name": "qa-api",
-                "resource_type": "GCE",
-                "region": "us-central1",
-                "state": "RUNNING",
-                "environment": "QA",
-                "hourly_cost": 0.160,
-                "tags": {"Environment": "QA", "Criticality": "ActiveLoad"}
-            },
-            {
-                "provider": "AWS",
-                "resource_id": "dev-cache",
-                "resource_name": "dev-cache",
-                "resource_type": "ELASTICACHE",
-                "region": "us-east-1",
-                "state": "RUNNING",
-                "environment": "Dev",
-                "hourly_cost": 0.068,
-                "tags": {"Environment": "Dev", "Engine": "Redis"}
-            },
-            {
-                "provider": "AWS",
-                "resource_id": "test-worker",
-                "resource_name": "test-worker",
-                "resource_type": "EC2",
-                "region": "us-east-1",
-                "state": "RUNNING",
-                "environment": "Test",
-                "hourly_cost": 0.096,
-                "tags": {"Environment": "Test", "Queue": "SQS"}
             },
             {
                 "provider": "K8S",
@@ -166,29 +166,21 @@ class SimulatedCloudDriver:
         """Multi-signal telemetry simulation supporting Active, True Idle, and False Idle profiles."""
         r_id = resource_id.lower()
         
-        # 1. False Idle / Safety Test Cases (Low CPU, but holding active sockets!)
-        if "test-db" in r_id or "build-runner" in r_id:
+        # 1. Active Load Cases (sandbox-01, test-db, build-runner, qa-api)
+        if "sandbox-01" in r_id or "i-0u3v4w5x" in r_id or "test-db" in r_id or "build-runner" in r_id:
+            sockets = 14 if ("sandbox-01" in r_id or "i-0u3v4w5x" in r_id) else (3 if "test-db" in r_id else 1)
+            cpu = 78.4 if ("sandbox-01" in r_id or "i-0u3v4w5x" in r_id) else 2.2
+            net = 85.0 if ("sandbox-01" in r_id or "i-0u3v4w5x" in r_id) else 4.2
             return {
-                "cpu_utilization": round(random.uniform(1.8, 2.4), 2),
-                "network_kbps": round(random.uniform(2.1, 4.5), 2),
-                "active_connections": 3 if "test-db" in r_id else 1,
-                "disk_io_iops": random.randint(1, 4),
-                "memory_pct": round(random.uniform(32.0, 42.0), 1),
-                "active_process_count": 3
+                "cpu_utilization": cpu,
+                "network_kbps": net,
+                "active_connections": sockets,
+                "disk_io_iops": 240.0 if ("sandbox-01" in r_id or "i-0u3v4w5x" in r_id) else 4.0,
+                "memory_pct": 74.0 if ("sandbox-01" in r_id or "i-0u3v4w5x" in r_id) else 35.0,
+                "active_process_count": 8 if ("sandbox-01" in r_id or "i-0u3v4w5x" in r_id) else 3
             }
         
-        # 2. Active Load Case (qa-api)
-        if "qa-api" in r_id:
-            return {
-                "cpu_utilization": round(random.uniform(45.0, 72.0), 2),
-                "network_kbps": round(random.uniform(320.0, 850.0), 2),
-                "active_connections": random.randint(15, 60),
-                "disk_io_iops": random.randint(25, 80),
-                "memory_pct": round(random.uniform(62.0, 78.0), 1),
-                "active_process_count": 8
-            }
-            
-        # 3. True Idle Candidates (staging-api, dev-cluster, ci-runner, analytics-worker, preview-app, dev-cache, test-worker)
+        # 2. True Idle Candidates (staging-api / i-0a1b2c3d, dev-worker / i-0e4f5g6h, qa-runner / i-0q7r8s9t, batch-worker / i-0m5n6o1p)
         return {
             "cpu_utilization": round(random.uniform(0.4, 1.4), 2),
             "network_kbps": round(random.uniform(0.5, 2.8), 2),

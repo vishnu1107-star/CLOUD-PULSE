@@ -374,6 +374,11 @@ export function ResourceTable({
                       <span className="text-[11px] font-semibold text-gray-400 italic px-2">
                         Locked
                       </span>
+                    ) : (w.tag === 'ACTIVE - not touched' || w.id === 'i-0u3v4w5x' || w.active_connections > 0 || w.cpu >= 2.5) && w.state === 'RUNNING' ? (
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold" title="Active workload: Reclaim unavailable per Safety Gate">
+                        <Lock className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Active Workload</span>
+                      </span>
                     ) : w.state === 'RUNNING' ? (
                       <button
                         onClick={() => onSafeReclaim && onSafeReclaim(w)}

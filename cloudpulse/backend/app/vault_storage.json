@@ -1,39 +1,136 @@
 {
   "snapshots": {
     "staging-api": {
-      "snapshot_id": "VP-00192",
+      "snapshot_id": "VP-00196",
       "resource_id": "staging-api",
       "resource_name": "staging-api",
-      "created_at": "2026-09-11 03:58:35 UTC",
-      "size_gb": 45.0,
-      "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "created_at": "2026-09-12 03:34:32 UTC",
+      "size_gb": 32.0,
+      "checksum": "a4564c15d12c42393bd66255289898178c22fddb539a385b85752edc8573d038",
       "integrity": "VERIFIED",
       "status": "VAULTED",
       "restore_available": true,
       "reversible": true,
       "state_payload": {
-        "state": "STOPPED",
-        "ports": [
-          80,
-          443
-        ],
-        "env": "Staging"
+        "resource_id": "staging-api",
+        "resource_name": "staging-api",
+        "provider": "AWS",
+        "environment": "Staging",
+        "previous_state": "RUNNING"
       }
     },
     "dev-cluster": {
-      "snapshot_id": "VP-00193",
+      "snapshot_id": "VP-00196",
       "resource_id": "dev-cluster",
       "resource_name": "dev-cluster",
-      "created_at": "2026-09-11 03:58:35 UTC",
-      "size_gb": 120.0,
-      "checksum": "a85c98fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855aa12",
+      "created_at": "2026-09-12 03:35:28 UTC",
+      "size_gb": 32.0,
+      "checksum": "14e18f3dba5101d8470de232720a4e64fb6c8a73c66a0421e7641716f510461e",
       "integrity": "VERIFIED",
       "status": "VAULTED",
       "restore_available": true,
       "reversible": true,
       "state_payload": {
-        "replicas": 0,
-        "namespace": "dev"
+        "resource_id": "dev-cluster",
+        "resource_name": "dev-cluster",
+        "provider": "K8S",
+        "environment": "Dev",
+        "previous_state": "RUNNING"
+      }
+    },
+    "ci-runner": {
+      "snapshot_id": "VP-00196",
+      "resource_id": "ci-runner",
+      "resource_name": "ci-runner",
+      "created_at": "2026-09-12 03:35:28 UTC",
+      "size_gb": 32.0,
+      "checksum": "3ccbdb75858da7732ed04ba2b8ab7e0e6ddcdb3973fa7a8b9f23150426be352b",
+      "integrity": "VERIFIED",
+      "status": "VAULTED",
+      "restore_available": true,
+      "reversible": true,
+      "state_payload": {
+        "resource_id": "ci-runner",
+        "resource_name": "ci-runner",
+        "provider": "GCP",
+        "environment": "Dev",
+        "previous_state": "RUNNING"
+      }
+    },
+    "analytics-worker": {
+      "snapshot_id": "VP-00197",
+      "resource_id": "analytics-worker",
+      "resource_name": "analytics-worker",
+      "created_at": "2026-09-12 03:35:28 UTC",
+      "size_gb": 32.0,
+      "checksum": "5ab8638a2dfbb88c14362014449206dac36b54739cd5da7f5e54f9bcd505ffb2",
+      "integrity": "VERIFIED",
+      "status": "VAULTED",
+      "restore_available": true,
+      "reversible": true,
+      "state_payload": {
+        "resource_id": "analytics-worker",
+        "resource_name": "analytics-worker",
+        "provider": "K8S",
+        "environment": "Staging",
+        "previous_state": "RUNNING"
+      }
+    },
+    "preview-app": {
+      "snapshot_id": "VP-00198",
+      "resource_id": "preview-app",
+      "resource_name": "preview-app",
+      "created_at": "2026-09-12 03:35:29 UTC",
+      "size_gb": 32.0,
+      "checksum": "692415fb3b2dc1e761cba3637b60e3fd1c3de98bf4c6979ac8e6c716e67ee8a7",
+      "integrity": "VERIFIED",
+      "status": "VAULTED",
+      "restore_available": true,
+      "reversible": true,
+      "state_payload": {
+        "resource_id": "preview-app",
+        "resource_name": "preview-app",
+        "provider": "AWS",
+        "environment": "Dev",
+        "previous_state": "RUNNING"
+      }
+    },
+    "dev-cache": {
+      "snapshot_id": "VP-00199",
+      "resource_id": "dev-cache",
+      "resource_name": "dev-cache",
+      "created_at": "2026-09-12 03:35:29 UTC",
+      "size_gb": 32.0,
+      "checksum": "49ff54a2530fca476c844b5319ee2c8edfebf2ba67621f05ba8cebce06faf43a",
+      "integrity": "VERIFIED",
+      "status": "VAULTED",
+      "restore_available": true,
+      "reversible": true,
+      "state_payload": {
+        "resource_id": "dev-cache",
+        "resource_name": "dev-cache",
+        "provider": "AWS",
+        "environment": "Dev",
+        "previous_state": "RUNNING"
+      }
+    },
+    "test-worker": {
+      "snapshot_id": "VP-00200",
+      "resource_id": "test-worker",
+      "resource_name": "test-worker",
+      "created_at": "2026-09-12 03:35:29 UTC",
+      "size_gb": 32.0,
+      "checksum": "e4cab722d5ee069e0b1aa5d81e07b5f9f29db271aa035c28ca419627f913ab3a",
+      "integrity": "VERIFIED",
+      "status": "VAULTED",
+      "restore_available": true,
+      "reversible": true,
+      "state_payload": {
+        "resource_id": "test-worker",
+        "resource_name": "test-worker",
+        "provider": "AWS",
+        "environment": "Test",
+        "previous_state": "RUNNING"
       }
     }
   },
