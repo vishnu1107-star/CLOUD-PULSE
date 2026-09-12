@@ -48,6 +48,28 @@ export function LiveControlConsole() {
     try {
       const aData = await CloudPulseAPI.getAnalyticsSummary()
       setAnalytics(aData)
+
+      const backendResources = await CloudPulseAPI.getResources()
+      if (backendResources && backendResources.length > 0) {
+        setWorkloads(prev => {
+          return prev.map(w => {
+            const backendMatch = backendResources.find(r => r.resource_id === w.id || r.resource_name === w.name)
+            if (backendMatch) {
+              const resState = (backendMatch.state || 'RUNNING').toUpperCase()
+              return {
+                ...w,
+                id: backendMatch.resource_id,
+                state: (['RUNNING', 'PAUSED', 'HYDRATING', 'RECLAIMED', 'STOPPED'].includes(resState) ? (resState === 'STOPPED' ? 'RECLAIMED' : resState as any) : 'RUNNING'),
+                cpu: backendMatch.metrics?.cpu_utilization ?? w.cpu,
+                network_kbps: backendMatch.metrics?.network_kbps ?? w.network_kbps,
+                active_connections: backendMatch.metrics?.active_connections ?? w.active_connections,
+                idle_confidence: backendMatch.metrics?.is_idle ? 98 : (backendMatch.metrics?.cpu_utilization && backendMatch.metrics.cpu_utilization > 50 ? 0 : w.idle_confidence),
+              }
+            }
+            return w
+          })
+        })
+      }
     } catch (err) {
       console.error("Dashboard data load error:", err)
     } finally {

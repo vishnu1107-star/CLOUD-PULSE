@@ -40,20 +40,19 @@ async def background_metric_evaluation_loop():
                     led_result.get("led_info", led_result.get("status"))
                 )
 
+                from app.api.v1.endpoints.resources import reclaim_resource
+
                 for item in evaluations:
                     is_idle = item.get("is_idle", False)
 
-                    # ----------------------------------------------------------------
-                    # Existing auto-stop logic — unchanged
-                    # ----------------------------------------------------------------
+                    # Automatic Reclamation Workflow: condition = TRUE and Safety Gate = SAFE_TO_RECLAIM
                     if policy.auto_stop_enabled and is_idle and not item.get("override_active"):
-                        result = await executor.stop_resource(
-                            item["resource_id"],
-                            is_automated=True,
-                            metrics=item.get("metrics")
+                        result = await reclaim_resource(
+                            resource_id=item["resource_id"],
+                            db=db
                         )
                         logger.info(
-                            "Reclamation result for %s: %s",
+                            "Automatic reclamation result for %s: %s",
                             item["resource_id"],
                             result
                         )
